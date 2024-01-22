@@ -1,0 +1,12 @@
+[Unit]
+Description=Wake screen on audio trigger
+After=network.target
+
+[Service]
+ExecStart=/home/raspberry/wake_on_audio_trigger.sh
+User=raspberry
+Restart=always
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target

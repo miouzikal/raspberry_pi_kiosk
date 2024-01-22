@@ -1,0 +1,54 @@
+{
+    "build": {
+        "context": "..",
+        "dockerfile": "Dockerfile"
+    },
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "aaron-bond.better-comments",
+                "ms-azuretools.vscode-docker",
+                "ms-python.black-formatter",
+                "ms-python.isort",
+                "ms-python.pylint",
+                "ms-python.python",
+                "ms-toolsai.jupyter",
+                "tamasfe.even-better-toml"
+            ],
+            "settings": {
+                "isort.check": true,
+                "terminal.integrated.fontFamily": "'CaskaydiaCove Nerd Font SemiLight', 'CaskaydiaCove NF Light'",
+                "editor.defaultFormatter": "ms-python.black-formatter",
+                "editor.bracketPairColorization.independentColorPoolPerBracketType": true,
+                "editor.codeActionsOnSave": {
+                    "source.fixAll": true,
+                    "source.organizeImports": true
+                },
+                "editor.formatOnPaste": true,
+                "editor.formatOnSave": true,
+                "editor.formatOnType": true,
+                "editor.guides.bracketPairs": true,
+                "editor.guides.bracketPairsHorizontal": false,
+                "files.exclude": {
+                    "**/.vscode": true,
+                    "**/__pycache__": true
+                },
+                "files.insertFinalNewline": true,
+                "files.trimTrailingWhitespace": true,
+                "git.confirmSync": false,
+                "notebook.cellToolbarLocation": {
+                    "default": "left"
+                },
+                "python.languageServer": "Pylance",
+                "pylint.importStrategy": "fromEnvironment",
+                "black-formatter.importStrategy": "fromEnvironment",
+                "isort.importStrategy": "fromEnvironment"
+            }
+        }
+    },
+    "name": "raspberry_pi_kiosk",
+    "postCreateCommand": "chmod +x ${containerWorkspaceFolder}/.devcontainer/scripts/postCreateCommand.sh && ${containerWorkspaceFolder}/.devcontainer/scripts/postCreateCommand.sh",
+    "remoteUser": "${localEnv:VSCODE_USER}",
+    "workspaceFolder": "/workspace",
+    "workspaceMount": "source=${localWorkspaceFolder},target=/workspace,type=bind"
+}
