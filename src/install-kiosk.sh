@@ -154,22 +154,6 @@ install_wifi_adapter_driver() {
     fi
 }
 
-# Main execution
-echo "Starting setup for Raspberry Pi Kiosk mode with Chromium browser"
-update_system
-install_packages
-configure_lightdm
-configure_openbox
-disable_boot_messages
-overclock_rpi
-configure_hdmi
-create_audio_trigger_script
-create_audio_trigger_service
-install_wifi_adapter_driver
-# clear screen
-clear
-echo -e "Setup complete! We need to configure a few more things before we can reboot the system.\n"
-
 # Function to configure hostname
 configure_hostname() {
     while true; do
@@ -186,6 +170,7 @@ configure_hostname() {
     fi
 }
 
+# Function to configure Home Assistant URL
 configure_home_assistant_url() {
     while true; do
         read -rp "Enter the URL of your Home Assistant instance: " HOME_ASSISTANT_URL
@@ -203,6 +188,7 @@ configure_home_assistant_url() {
     fi
 }
 
+# Function to enable I2C
 enable_ic2() {
     echo "Enabling I2C..."
     if sudo raspi-config nonint do_i2c 0; then
@@ -212,6 +198,7 @@ enable_ic2() {
     fi
 }
 
+# Function to enable GUI autologin
 enable_gui_autologin() {
     echo "Enabling GUI autologin..."
     if sudo raspi-config nonint do_boot_behaviour B4; then
@@ -221,6 +208,20 @@ enable_gui_autologin() {
     fi
 }
 
+# Main execution
+echo "Starting setup for Raspberry Pi Kiosk mode with Chromium browser"
+update_system
+install_packages
+configure_lightdm
+configure_openbox
+disable_boot_messages
+overclock_rpi
+configure_hdmi
+create_audio_trigger_script
+create_audio_trigger_service
+install_wifi_adapter_driver
+
+echo -e "\n\nSetup complete!\n\nWe need to configure a few more things before we can reboot the system.\n"
 configure_hostname
 configure_home_assistant_url
 enable_ic2
