@@ -9,7 +9,6 @@ Set up a Raspberry Pi to operate in Kiosk mode using the Chromium browser, speci
 3. [Setting Up Kiosk Mode](#setting-up-kiosk-mode)
 4. [Post-Setup Instructions](#post-setup-instructions)
 5. [Troubleshooting](#troubleshooting)
-6. [Safety and Maintenance](#safety-and-maintenance)
 
 ## Prerequisites
 - Raspberry Pi (compatible with Raspbian Lite Bookworm 64-bit)
@@ -63,18 +62,18 @@ Set up a Raspberry Pi to operate in Kiosk mode using the Chromium browser, speci
 ### 4. Run Kiosk Installation Script
 - Ensure the script is executable and then run it:
   ```bash
-  chmod +x install_kiosk.sh
-  sudo ./install_kiosk.sh
+  chmod +x install-kiosk.sh
+  sudo ./install-kiosk.sh
   ```
 
 ### 5. Change Hostname, Enable GUI Autologin and IC2 Interface
 - Execute `sudo raspi-config`
 - Navigate to "System Options" > "Hostname"
-- Change the hostname to your desired name
+  - Change the hostname to your desired name
 - Navigate to "System Options" > "Boot / Auto Login"
-- Select "Desktop Autologin"
+  - Select "Desktop Autologin"
 - Navigate to "Interface Options" > "I2C"
-- Select "Yes" to enable the I2C interface
+  - Select "Yes" to enable the I2C interface
 - Exit raspi-config and reboot
 
 ## Post-Setup Instructions
@@ -86,7 +85,3 @@ Upon rebooting, the Raspberry Pi should launch into the GUI and open the Chromiu
 - Confirm script permissions and execution
 - Consult Raspberry Pi forums and documentation for specific issues
 
-## Safety and Maintenance
-- Regularly update your Raspberry Pi
-- Properly shut down to avoid data corruption
-- Monitor temperature and performance, especially if overclocking
