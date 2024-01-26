@@ -129,8 +129,13 @@ install_wifi_adapter_driver() {
         git clone https://github.com/morrownr/88x2bu-20210702.git /home/$USERNAME/wifi-driver
         cd /home/$USERNAME/wifi-driver || echo "Failed to change directory to /home/$USERNAME/wifi-driver"
         sudo ./install-driver.sh NoPrompt
-        echo "dtoverlay=disable-wifi" | sudo tee -a /boot/config.txt
-
+        if ! lsmod | grep 88x2bu >/dev/null; then
+            echo -e "\e[31mFailed to install Wifi adapter driver. Please install it manually.\e[0m"
+        fi
+        if ! grep -q "^dtoverlay=disable-wifi" "/boot/config.txt"; then
+            echo "Disabling onboard Wifi..."
+            echo "dtoverlay=disable-wifi" | sudo tee -a /boot/config.txt
+        fi
         # File path
         CONF_FILE="/etc/modprobe.d/88x2bu.conf"
 
@@ -221,7 +226,7 @@ create_audio_trigger_script
 create_audio_trigger_service
 install_wifi_adapter_driver
 
-echo -e "\n\nSetup complete!\n\nWe need to configure a few more things before we can reboot the system.\n"
+echo -e "\n\nAlmost done! Please provide the following information to complete the setup:\n"
 configure_hostname
 configure_home_assistant_url
 enable_ic2
