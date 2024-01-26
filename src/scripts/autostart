@@ -1,3 +1,5 @@
+#!/bin/bash
+
 xset +dpms
 xset dpms 0 0 300
 xset s noblank

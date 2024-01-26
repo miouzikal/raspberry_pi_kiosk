@@ -1,20 +1,11 @@
 #!/bin/bash
 
 # Configuration Variables
-HOME_ASSISTANT_URL="___HOME_ASSISTANT_URL___"
 USERNAME="raspberry"
-TOUCH_DEVICE_NAME="Waveshare"
-DISPLAY_SETTING=":0"
-ROTATION_MATRIX='0 -1 1 1 0 0 0 0 1'
-HDMI_OUTPUT="HDMI-1"
-ROTATE_ORIENTATION="left"
 CPU_OVERCLOCK_FREQUENCY="2000"
 GPU_OVERCLOCK_FREQUENCY="750"
 GPU_MEMORY="256"
-IDLE_TIME_THRESHOLD="300" # 5 minutes in seconds
 # Additional Configuration for Audio Trigger Script
-AUDIO_THRESHOLD="0.005"     # Audio trigger threshold
-AUDIO_TRIGGER_METHOD="PEAK" # PEAK or RMS
 AUDIO_TRIGGER_SCRIPT="/home/$USERNAME/wake_on_audio_trigger.sh"
 AUDIO_TRIGGER_SERVICE="/etc/systemd/system/wake_on_audio_trigger.service"
 # Function to update and upgrade system packages
@@ -27,7 +18,7 @@ update_system() {
 # Function to install required packages
 install_packages() {
     echo "Installing required packages..."
-    sudo apt-get install --no-install-recommends vim xserver-xorg x11-xserver-utils openbox lightdm chromium-browser xinput fonts-noto-color-emoji xprintidle ddcutil xdotool bc sox jq python3-pygame python3-numpy -y
+    sudo apt-get install --no-install-recommends vim xserver-xorg x11-xserver-utils openbox lightdm chromium-browser xinput fonts-noto-color-emoji xprintidle ddcutil xdotool bc sox jq python3-pygame python3-numpy dkms git -y
 }
 
 # Function to configure LightDM
@@ -131,6 +122,38 @@ create_audio_trigger_service() {
     systemctl start wake_on_audio_trigger.service
 }
 
+# Install Wifi adapter driver
+install_wifi_adapter_driver() {
+    if lsusb | grep "2357:012d" >/dev/null; then
+        echo "Installing driver for Wifi adapter..."
+        git clone https://github.com/morrownr/88x2bu-20210702.git /home/$USERNAME/wifi-driver
+        cd /home/$USERNAME/wifi-driver || echo "Failed to change directory to /home/$USERNAME/wifi-driver"
+        sudo ./install-driver.sh NoPrompt
+        echo "dtoverlay=disable-wifi" | sudo tee -a /boot/config.txt
+
+        # File path
+        CONF_FILE="/etc/modprobe.d/88x2bu.conf"
+
+        # Function to update or add an option
+        update_or_add_option() {
+            local option="$1"
+            local value="$2"
+            local pattern="^options 88x2bu .*${option}="
+            if grep -qE "$pattern" "$CONF_FILE"; then
+                # Update the existing option
+                sudo sed -i -r "s/($pattern)[^ ]*/\1$value/" "$CONF_FILE"
+            else
+                # Add the option
+                sudo sed -i "/^options 88x2bu /s/$/ ${option}=${value}/" "$CONF_FILE"
+            fi
+        }
+
+        # Update or add rtw_switch_usb_mode and rtw_country_code
+        update_or_add_option "rtw_switch_usb_mode" "1"
+        update_or_add_option "rtw_country_code" "CA"
+    fi
+}
+
 # Main execution
 echo "Starting setup for Raspberry Pi Kiosk mode with Chromium browser"
 update_system
@@ -142,9 +165,69 @@ overclock_rpi
 configure_hdmi
 create_audio_trigger_script
 create_audio_trigger_service
+install_wifi_adapter_driver
+# clear screen
+clear
+echo -e "Setup complete! We need to configure a few more things before we can reboot the system.\n"
+
+# Function to configure hostname
+configure_hostname() {
+    while true; do
+        read -rp "Enter a hostname for the system: " HOSTNAME
+        read -rp "Confirm hostname '$HOSTNAME'? [Y/n] " CONFIRM
+        if [[ -z "$CONFIRM" || "$CONFIRM" =~ ^[Yy]$ ]]; then
+            break
+        fi
+    done
+    if sudo raspi-config nonint do_hostname "$HOSTNAME"; then
+        echo "Hostname set to '$HOSTNAME'."
+    else
+        echo "Failed to set hostname to '$HOSTNAME'. Please change it with 'sudo raspi-config'."
+    fi
+}
+
+configure_home_assistant_url() {
+    while true; do
+        read -rp "Enter the URL of your Home Assistant instance: " HOME_ASSISTANT_URL
+        read -rp "Confirm Home Assistant URL '$HOME_ASSISTANT_URL'? [Y/n] " CONFIRM
+        if [[ -z "$CONFIRM" || "$CONFIRM" =~ ^[Yy]$ ]]; then
+            break
+        fi
+    done
+    sed -i "s|___HOME_ASSISTANT_URL___|$HOME_ASSISTANT_URL|" /home/$USERNAME/.config/openbox/autostart
+    if grep -q "$HOME_ASSISTANT_URL" "/home/$USERNAME/.config/openbox/autostart"; then
+        echo "Home Assistant URL successfully set to $HOME_ASSISTANT_URL."
+    else
+        echo "Failed to set Home Assistant URL to $HOME_ASSISTANT_URL. Please change it manually in /home/$USERNAME/.config/openbox/autostart."
+        exit 1
+    fi
+}
+
+enable_ic2() {
+    echo "Enabling I2C..."
+    if sudo raspi-config nonint do_i2c 0; then
+        echo "I2C enabled."
+    else
+        echo "Failed to enable I2C. Please enable it with 'sudo raspi-config'."
+    fi
+}
+
+enable_gui_autologin() {
+    echo "Enabling GUI autologin..."
+    if sudo raspi-config nonint do_boot_behaviour B4; then
+        echo "GUI autologin enabled."
+    else
+        echo "Failed to enable GUI autologin. Please enable it with 'sudo raspi-config'."
+    fi
+}
+
+configure_hostname
+configure_home_assistant_url
+enable_ic2
+enable_gui_autologin
 
 # Fix permissions
 echo "Fixing permissions on /home/$USERNAME..."
 sudo chown -R $USERNAME:$USERNAME "/home/$USERNAME"
 
-echo "Setup complete! Please enable GUI autologin for user $USERNAME in raspi-config (and I2C if you want to use ddcutil)."
+echo "Setup complete! You can now reboot the system."
