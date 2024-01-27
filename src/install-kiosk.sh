@@ -155,6 +155,7 @@ install_wifi_adapter_driver() {
         # Update or add rtw_switch_usb_mode and rtw_country_code
         update_or_add_option "rtw_switch_usb_mode" "1"
         update_or_add_option "rtw_country_code" "CA"
+        update_or_add_option "rtw_power_mgnt" "0"
     fi
 }
 
