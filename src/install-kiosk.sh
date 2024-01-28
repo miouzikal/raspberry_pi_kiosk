@@ -38,7 +38,7 @@ configure_openbox() {
     AUTOSTART_FILE="$AUTOSTART_DIR/autostart"
     mkdir -p "$AUTOSTART_DIR"
     chown $USERNAME:$USERNAME "$AUTOSTART_DIR"
-    cp ./scripts/autostart "$AUTOSTART_FILE"
+    cp ./scripts/openbox/autostart "$AUTOSTART_FILE"
     chown $USERNAME:$USERNAME "$AUTOSTART_FILE"
 }
 
@@ -109,7 +109,7 @@ disable_boot_messages() {
 # Function to create the audio trigger script
 create_audio_trigger_script() {
     echo "Creating audio trigger script..."
-    cp ./scripts/wake_on_audio_trigger.sh "$AUDIO_TRIGGER_SCRIPT"
+    cp ./scripts/wake_on_audio/wake_on_audio_trigger.sh "$AUDIO_TRIGGER_SCRIPT"
     chmod +x "$AUDIO_TRIGGER_SCRIPT"
     chown $USERNAME:$USERNAME "$AUDIO_TRIGGER_SCRIPT"
 }
@@ -117,7 +117,7 @@ create_audio_trigger_script() {
 # Function to create and enable a systemd service for the audio trigger script
 create_audio_trigger_service() {
     echo "Creating systemd service for audio trigger script..."
-    cp ./scripts/wake_on_audio_trigger.service "$AUDIO_TRIGGER_SERVICE"
+    cp ./scripts/wake_on_audio/wake_on_audio_trigger.service "$AUDIO_TRIGGER_SERVICE"
     systemctl enable wake_on_audio_trigger.service
     systemctl start wake_on_audio_trigger.service
 }
