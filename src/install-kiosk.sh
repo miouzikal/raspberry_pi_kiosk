@@ -6,8 +6,8 @@ CPU_OVERCLOCK_FREQUENCY="2000"
 GPU_OVERCLOCK_FREQUENCY="750"
 GPU_MEMORY="256"
 # Additional Configuration for Audio Trigger Script
-AUDIO_TRIGGER_SCRIPT="/home/$USERNAME/wake_on_audio_trigger.sh"
-AUDIO_TRIGGER_SERVICE="/etc/systemd/system/wake_on_audio_trigger.service"
+AUDIO_TRIGGER_SCRIPT="/home/$USERNAME/wake_on_sound.sh"
+AUDIO_TRIGGER_SERVICE="/etc/systemd/system/wake_on_sound.service"
 # Function to update and upgrade system packages
 update_system() {
     echo "Updating system packages..."
@@ -109,7 +109,7 @@ disable_boot_messages() {
 # Function to create the audio trigger script
 create_audio_trigger_script() {
     echo "Creating audio trigger script..."
-    cp ./scripts/wake_on_audio/wake_on_audio_trigger.sh "$AUDIO_TRIGGER_SCRIPT"
+    cp ./scripts/wake_on_sound/wake_on_sound.sh "$AUDIO_TRIGGER_SCRIPT"
     chmod +x "$AUDIO_TRIGGER_SCRIPT"
     chown $USERNAME:$USERNAME "$AUDIO_TRIGGER_SCRIPT"
 }
@@ -117,9 +117,9 @@ create_audio_trigger_script() {
 # Function to create and enable a systemd service for the audio trigger script
 create_audio_trigger_service() {
     echo "Creating systemd service for audio trigger script..."
-    cp ./scripts/wake_on_audio/wake_on_audio_trigger.service "$AUDIO_TRIGGER_SERVICE"
-    systemctl enable wake_on_audio_trigger.service
-    systemctl start wake_on_audio_trigger.service
+    cp ./scripts/wake_on_sound/wake_on_sound.service "$AUDIO_TRIGGER_SERVICE"
+    systemctl enable wake_on_sound.service
+    systemctl start wake_on_sound.service
 }
 
 # Install Wifi adapter driver
