@@ -7,7 +7,7 @@ DEBUG_MODE=1
 TRIGGER_METHOD="PEAK" # PEAK or RMS
 export DISPLAY=:0
 IDLE_TIME_THRESHOLD_MS=300000
-LOG_FILE="/home/raspberry/audio_trigger.log"
+LOG_FILE="/home/raspberry/wake_on_sound.log"
 
 # Function to write messages to a log file
 log_message() {

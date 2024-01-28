@@ -3,7 +3,7 @@ Description=Wake screen on audio trigger
 After=network.target
 
 [Service]
-ExecStart=/home/raspberry/wake_on_audio_trigger.sh
+ExecStart=/home/raspberry/wake_on_sound.sh
 User=raspberry
 Restart=always
 RestartSec=3
