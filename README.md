@@ -49,24 +49,19 @@ Set up a Raspberry Pi to operate in Kiosk mode using the Chromium browser, speci
   git clone https://github.com/miouzikal/raspberry_pi_kiosk ~/raspberry_pi_kiosk
   ```
 
-### 3. Modify Kiosk Script with Home Assistant URL
-- Change directory to the cloned repository's source folder:
+### 3. Run Kiosk Installation Script
+- Change directory to the cloned repository and run the installation script:
   ```bash
   cd ~/raspberry_pi_kiosk/src
-  ```
-
-### 4. Run Kiosk Installation Script
-- Ensure the script is executable and then run it:
-  ```bash
   chmod +x install-kiosk.sh
   sudo ./install-kiosk.sh
   ```
 
-### 5. Before Rebooting, Enter the Following Information when Prompted:
+### 4. Before Rebooting, Enter the Following Information when Prompted:
 - New hostname of the Raspberry Pi
 - Home Assistant URL (Chromium will open to this URL in kiosk mode)
 
-### 6. Automatic Setup
+### 5. Automatic Setup
 - The script will also enable I2C for brightness control and GUI autologin before prompting to reboot
 
 ## Post-Setup Instructions
