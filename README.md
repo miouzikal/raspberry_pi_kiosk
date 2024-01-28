@@ -1,7 +1,14 @@
 
 # Raspberry Pi Kiosk Mode Setup
 
-Set up a Raspberry Pi to operate in Kiosk mode using the Chromium browser, specifically for Raspbian Lite (Bookworm 64-bit). This guide is intended for users who have basic knowledge of Raspberry Pi and Linux commands.
+This guide is a personal project to create a Raspberry Pi 4B kiosk for my Home Assistant UI. It is intended to be a reference for myself and others who may be interested in doing the same.
+The hardware i used for this project are as follows:
+- Raspberry Pi 4B 4GB
+- [64GB Raddor SD Card](https://www.amazon.ca/-/fr/dp/B0CD2SR4XM?ref=ppx_yo2ov_dt_b_product_details&th=1)
+- [WaveShare 10.1DP-CAPLCD screen](https://www.amazon.ca/-/fr/dp/B0BPM9VTY6?ref=ppx_yo2ov_dt_b_product_details&th=1)
+- [Copper Heatsink](https://www.amazon.ca/-/fr/Dissipateur-thermique-acrylique-Raspberry-d%C3%A9paisseur/dp/B0CP5SLMLM/ref=sr_1_14?__mk_fr_CA=%C3%85M%C3%85%C5%BD%C3%95%C3%91&crid=1QVUH3VEBV6A3&keywords=copper+raspberry+pi+heatsink&qid=1706462908&s=electronics&sprefix=copper+raspberry+pi+heatsink%2Celectronics%2C84&sr=1-14)
+- [TP-Link Archer T3U](https://www.amazon.ca/dp/B07P6N2TZH?psc=1&ref=ppx_yo2ov_dt_b_product_details) (copper heatsink interferes with onboard WiFi)
+- [USB Microphone](https://www.amazon.ca/-/fr/gp/product/B01KLRBHGM/ref=ppx_yo_dt_b_search_asin_title?ie=UTF8&psc=1) (for wake on sound)
 
 ## Table of Contents
 1. [Prerequisites](#prerequisites)
