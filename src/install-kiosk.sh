@@ -44,30 +44,30 @@ configure_openbox() {
 
 # Function to overclock Raspberry Pi
 overclock_rpi() {
-    if ! grep -q "^over_voltage=6" "/boot/config.txt"; then
+    if ! grep -q "^over_voltage=6" "/boot/firmware/config.txt"; then
         echo "Overvolting Raspberry Pi to 6..."
-        sudo tee -a "/boot/config.txt" <<<"over_voltage=6"
+        sudo tee -a "/boot/firmware/config.txt" <<<"over_voltage=6"
     else
         echo "Raspberry Pi already overvolted."
     fi
 
-    if ! grep -q "^arm_freq=$CPU_OVERCLOCK_FREQUENCY" "/boot/config.txt"; then
+    if ! grep -q "^arm_freq=$CPU_OVERCLOCK_FREQUENCY" "/boot/firmware/config.txt"; then
         echo "Overclocking Raspberry Pi to $CPU_OVERCLOCK_FREQUENCY MHz..."
-        sudo tee -a "/boot/config.txt" <<<"arm_freq=$CPU_OVERCLOCK_FREQUENCY"
+        sudo tee -a "/boot/firmware/config.txt" <<<"arm_freq=$CPU_OVERCLOCK_FREQUENCY"
     else
         echo "Raspberry Pi CPU already overclocked."
     fi
 
-    if ! grep -q "^gpu_freq=$GPU_OVERCLOCK_FREQUENCY" "/boot/config.txt"; then
+    if ! grep -q "^gpu_freq=$GPU_OVERCLOCK_FREQUENCY" "/boot/firmware/config.txt"; then
         echo "Overclocking GPU to $GPU_OVERCLOCK_FREQUENCY MHz..."
-        sudo tee -a "/boot/config.txt" <<<"gpu_freq=$GPU_OVERCLOCK_FREQUENCY"
+        sudo tee -a "/boot/firmware/config.txt" <<<"gpu_freq=$GPU_OVERCLOCK_FREQUENCY"
     else
         echo "Raspberry Pi GPU already overclocked."
     fi
 
-    if ! grep -q "^gpu_mem=$GPU_MEMORY" "/boot/config.txt"; then
+    if ! grep -q "^gpu_mem=$GPU_MEMORY" "/boot/firmware/config.txt"; then
         echo "Assigning $GPU_MEMORY MB of RAM to GPU..."
-        sudo tee -a "/boot/config.txt" <<<"gpu_mem=$GPU_MEMORY"
+        sudo tee -a "/boot/firmware/config.txt" <<<"gpu_mem=$GPU_MEMORY"
     else
         echo "Raspberry Pi GPU memory already set."
     fi
@@ -75,35 +75,30 @@ overclock_rpi() {
 
 # Function to set HDMI configuration
 configure_hdmi() {
-    if ! grep -q "^hdmi_group=2" "/boot/config.txt" &&
-        ! grep -q "^hdmi_mode=87" "/boot/config.txt" &&
-        ! grep -q "^hdmi_cvt 1280 800 60 6 0 0 0" "/boot/config.txt" &&
-        ! grep -q "^hdmi_drive=1" "/boot/config.txt"; then
-        echo "Appending HDMI configuration to /boot/config.txt..."
-        sudo tee -a "/boot/config.txt" <<<"hdmi_group=2"
-        sudo tee -a "/boot/config.txt" <<<"hdmi_mode=87"
-        sudo tee -a "/boot/config.txt" <<<"hdmi_cvt 1280 800 60 6 0 0 0"
-        sudo tee -a "/boot/config.txt" <<<"hdmi_drive=1"
+    if ! grep -q "^hdmi_group=2" "/boot/firmware/config.txt" &&
+        ! grep -q "^hdmi_mode=87" "/boot/firmware/config.txt" &&
+        ! grep -q "^hdmi_cvt 1280 800 60 6 0 0 0" "/boot/firmware/config.txt" &&
+        ! grep -q "^hdmi_drive=1" "/boot/firmware/config.txt"; then
+        echo "Appending HDMI configuration to /boot/firmware/config.txt..."
+        sudo tee -a "/boot/firmware/config.txt" <<<"hdmi_group=2"
+        sudo tee -a "/boot/firmware/config.txt" <<<"hdmi_mode=87"
+        sudo tee -a "/boot/firmware/config.txt" <<<"hdmi_cvt 1280 800 60 6 0 0 0"
+        sudo tee -a "/boot/firmware/config.txt" <<<"hdmi_drive=1"
     else
-        echo "HDMI configuration already set in /boot/config.txt."
+        echo "HDMI configuration already set in /boot/firmware/config.txt."
     fi
 }
 
 # Disable boot messages
 disable_boot_messages() {
     echo "Disabling boot messages..."
-    temp_file=$(mktemp)
-    original_attributes=$(stat -c '%a' "/boot/cmdline.txt")
-    sed "s/tty1/tty3/" "/boot/cmdline.txt" >"$temp_file"
-    sudo cp --preserve=ownership "$temp_file" "/boot/cmdline.txt"
-    sudo chmod "$original_attributes" "/boot/cmdline.txt"
-    if ! grep -q "quiet splash loglevel=0 logo.nologo vt.global_cursor_default=0" "/boot/cmdline.txt"; then
-        sudo tee -a "/boot/cmdline.txt" <<<" quiet splash loglevel=0 logo.nologo vt.global_cursor_default=0"
+    sed -i "s/tty1/tty3/" "/boot/firmware/cmdline.txt"
+    if ! grep -q "quiet splash loglevel=0 logo.nologo vt.global_cursor_default=0" "/boot/firmware/cmdline.txt"; then
+        sudo tee -a "/boot/firmware/cmdline.txt" <<<" quiet splash loglevel=0 logo.nologo vt.global_cursor_default=0"
     fi
-    if ! grep -q "^disable_splash=1" "/boot/config.txt"; then
-        sudo tee -a "/boot/config.txt" <<<"disable_splash=1"
+    if ! grep -q "^disable_splash=1" "/boot/firmware/config.txt"; then
+        sudo tee -a "/boot/firmware/config.txt" <<<"disable_splash=1"
     fi
-    rm "$temp_file"
 }
 
 # Function to create the audio trigger script
@@ -133,9 +128,9 @@ install_wifi_adapter_driver() {
         if [ ! -f "$CONF_FILE" ]; then
             echo -e "\e[31mFailed to install Wifi adapter driver. Please install it manually.\e[0m"
         fi
-        if ! grep -q "^dtoverlay=disable-wifi" "/boot/config.txt"; then
+        if ! grep -q "^dtoverlay=disable-wifi" "/boot/firmware/config.txt"; then
             echo "Disabling onboard Wifi..."
-            echo "dtoverlay=disable-wifi" | sudo tee -a /boot/config.txt
+            echo "dtoverlay=disable-wifi" | sudo tee -a /boot/firmware/config.txt
         fi
 
         # Function to update or add an option
