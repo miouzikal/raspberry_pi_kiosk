@@ -5,6 +5,7 @@ After=network.target
 [Service]
 ExecStart=/usr/bin/python3 /home/raspberry/button_handler.py
 User=raspberry
+WorkingDirectory=/home/raspberry
 Restart=always
 RestartSec=3
 
