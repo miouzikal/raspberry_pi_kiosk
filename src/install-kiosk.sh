@@ -117,6 +117,21 @@ create_audio_trigger_service() {
     systemctl start wake_on_sound.service
 }
 
+# Function to create the button handler script
+create_button_handler_script() {
+    echo "Creating button handler script..."
+    cp ./scripts/button_handler/button_handler.py "/home/$USERNAME/button_handler.py"
+    chown $USERNAME:$USERNAME "/home/$USERNAME/button_handler.py"
+}
+
+# Function to create and enable a systemd service for the button handler script
+create_button_handler_service() {
+    echo "Creating systemd service for button handler script..."
+    cp ./scripts/button_handler/button_handler.service "/etc/systemd/system/button_handler.service"
+    systemctl enable button_handler.service
+    systemctl start button_handler.service
+}
+
 # Install Wifi adapter driver
 install_wifi_adapter_driver() {
     if lsusb | grep "2357:012d" >/dev/null; then
@@ -219,6 +234,8 @@ overclock_rpi
 configure_hdmi
 create_audio_trigger_script
 create_audio_trigger_service
+create_button_handler_script
+create_button_handler_service
 install_wifi_adapter_driver
 
 echo -e "\n\nAlmost done! Please provide the following information to complete the setup:\n"

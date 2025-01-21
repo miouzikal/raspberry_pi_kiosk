@@ -13,4 +13,4 @@ else
 fi
 sed -i 's/"exited_cleanly":false/"exited_cleanly":true/' ~/.config/chromium/'Local State'
 sed -i 's/"exited_cleanly":false/"exited_cleanly":true/; s/"exit_type":"[^"]+"/"exit_type":"Normal"/' ~/.config/chromium/Default/Preferences
-chromium-browser --force-dark-mode --noerrdialogs --disable-infobars --disable-pinch --remote-debugging-port=9222 --check-for-update-interval=31536000 --force-device-scale-factor=1.322 --kiosk ___HOME_ASSISTANT_URL___ &
+chromium-browser --force-dark-mode --noerrdialogs --disable-infobars --disable-pinch --remote-debugging-port=9222 --check-for-update-interval=31536000 --enable-features=OverlayScrollbar --disable-restore-session-state --kiosk ___HOME_ASSISTANT_URL___ &

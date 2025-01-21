@@ -39,16 +39,11 @@ RUN useradd -m -s /bin/zsh $VSCODE_USER && \
 
 # Install Micromamba
 ENV MAMBA_ROOT_PREFIX /opt/conda
-RUN curl -Ls https://micro.mamba.pm/api/micromamba/linux-64/latest | tar -xvj -C /usr/ bin/micromamba && \
+RUN curl -Ls https://micro.mamba.pm/api/micromamba/linux-aarch64/latest | tar -xvj -C /usr/ bin/micromamba && \
     mkdir -p $MAMBA_ROOT_PREFIX && \
     chown $VSCODE_USER:$VSCODE_USER $MAMBA_ROOT_PREFIX && \
     chmod a+rx $MAMBA_ROOT_PREFIX && \
     printf "channels:\n  - conda-forge\n" >> $MAMBA_ROOT_PREFIX/.mambarc
-
-# Install AWS CLI v2
-RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" && \
-    unzip awscliv2.zip && ./aws/install && \
-    rm -rf awscliv2 awscliv2.zip
 
 # Install OhMyZSH, Initialize Micromamba and Customize $VSCODE_USER environment
 USER $VSCODE_USER
@@ -56,7 +51,7 @@ ENV WORKSPACE_PATH /workspace
 RUN sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" --unattended && \
     git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k && \
     sed -i '/^[^#]*ZSH_THEME/s/.*/ZSH_THEME="powerlevel10k\/powerlevel10k"/' ~/.zshrc && \
-    micromamba shell init -s zsh -p $MAMBA_ROOT_PREFIX && \
+    micromamba shell init -s zsh && \
     echo 'alias project_manager="micromamba run python $WORKSPACE_PATH/.devcontainer/scripts/project_manager.py"' >> ~/.zshrc && \
     echo 'alias pm="project_manager"' >> ~/.zshrc && \
     echo 'alias mm="micromamba"' >> ~/.zshrc && \
