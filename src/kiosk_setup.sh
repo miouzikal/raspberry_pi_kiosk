@@ -428,7 +428,7 @@ if command -v chromium-browser &> /dev/null; then
 ${rotation_script}
 
 # Launch Chromium in kiosk mode
-chromium-browser --incognito --autoplay-policy=no-user-gesture-required --kiosk "$kiosk_url" &
+chromium-browser --incognito --force-dark-mode --noerrdialogs --disable-infobars --disable-pinch --remote-debugging-port=9222 --check-for-update-interval=31536000 --enable-features=OverlayScrollbar --disable-restore-session-state --kiosk "$kiosk_url" &
 EOL
 
     chmod +x "$labwc_autostart"
