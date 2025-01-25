@@ -4,11 +4,8 @@
 #
 # This script configures a Raspberry Pi to run in Wayland kiosk mode with greetd, labwc, 
 # and Chromium. It also provides optional Pi-specific configurations such as overclocking,
-# 1280×800 HDMI settings, display/touch rotation, Realtek USB Wi-Fi driver installation,
+# HDMI settings for Waveshare 10.1DP-CAPLCD, display/touch rotation, Realtek USB Wi-Fi driver installation,
 # silent boot, hostname changes, I2C enabling, and custom scripts (wake_on_sound, button_handler).
-#
-# A new feature is the udev rule for touchscreen input rotation. If you choose a rotation,
-# you can automatically apply a LIBINPUT_CALIBRATION_MATRIX to match your display orientation.
 #
 # Usage:
 #   1) chmod +x kiosk_setup.sh
@@ -92,7 +89,7 @@ echo "==========================================================="
 echo "This script will help you configure your Raspberry Pi with:"
 echo "  • greetd + labwc (Wayland) + autologin"
 echo "  • Chromium in kiosk mode"
-echo "  • Optional Pi tweaks (overclock, 1280×800 HDMI, rotate"
+echo "  • Optional Pi tweaks (overclock, HDMI settings for Waveshare 10.1DP-CAPLCD, rotate"
 echo "    display/touch, Realtek driver, silent boot, etc.)"
 echo "  • Custom scripts/services"
 echo
@@ -105,14 +102,14 @@ echo
 # 1. UPDATE & UPGRADE PACKAGES
 # ------------------------------------------------------------------------------
 echo "STEP 1: System Update & Upgrade"
-if ask_user "Update the package list with 'sudo apt update' now?"; then
+if ask_user "Update the package list now?"; then
   echo -e "\e[90mUpdating package list...\e[0m"
   sudo apt update > /dev/null 2>&1 &
   spinner $! "Updating package list..."
 fi
 
 echo
-if ask_user "Upgrade installed packages with 'sudo apt upgrade -y' now?"; then
+if ask_user "Upgrade installed packages now?"; then
   echo -e "\e[90mUpgrading installed packages (this can take a while)...\e[0m"
   sudo apt upgrade -y > /dev/null 2>&1 &
   spinner $! "Upgrading packages..."
@@ -123,7 +120,7 @@ fi
 # ------------------------------------------------------------------------------
 echo
 echo "STEP 2: Wayland Components (greetd, labwc, seatd, wlr-randr)"
-if ask_user "Install greetd, labwc, seatd, and wlr-randr now?"; then
+if ask_user "Install Wayland components now?"; then
   echo -e "\e[90mInstalling greetd, labwc, seatd, and wlr-randr...\e[0m"
   sudo apt install --no-install-recommends -y greetd labwc seatd wlr-randr > /dev/null 2>&1 &
   spinner $! "Installing greetd + labwc..."
@@ -166,7 +163,7 @@ fi
 # ------------------------------------------------------------------------------
 echo
 echo "STEP 4: Overclocking (OPTIONAL)"
-if ask_user "Would you like to set overclock parameters individually?"; then
+if ask_user "Set overclock parameters individually?"; then
   echo -e "\nYou can set each parameter or press Enter to skip."
 
   read -r -p "• over_voltage [recommended=6, skip by leaving blank]: " ov_in
@@ -205,11 +202,11 @@ else
 fi
 
 # ------------------------------------------------------------------------------
-# 5. SET 1280×800 HDMI CONFIG
+# 5. SET HDMI CONFIG FOR WAVESHARE 10.1DP-CAPLCD
 # ------------------------------------------------------------------------------
 echo
-echo "STEP 5: 1280×800 HDMI Configuration"
-if ask_user "Configure 1280×800 HDMI in '$CONFIG_TXT_PATH'?"; then
+echo "STEP 5: HDMI Configuration for Waveshare 10.1DP-CAPLCD"
+if ask_user "Configure HDMI settings for Waveshare 10.1DP-CAPLCD?"; then
   if ! grep -q "^hdmi_group=2" "$CONFIG_TXT_PATH"; then
     echo "hdmi_group=2" | sudo tee -a "$CONFIG_TXT_PATH" >/dev/null
   fi
@@ -222,9 +219,9 @@ if ask_user "Configure 1280×800 HDMI in '$CONFIG_TXT_PATH'?"; then
   if ! grep -q "^hdmi_drive=1" "$CONFIG_TXT_PATH"; then
     echo "hdmi_drive=1" | sudo tee -a "$CONFIG_TXT_PATH" >/dev/null
   fi
-  echo -e "\e[32m✔ 1280×800 config added to $CONFIG_TXT_PATH.\e[0m"
+  echo -e "\e[32m✔ HDMI config for Waveshare 10.1DP-CAPLCD added to $CONFIG_TXT_PATH.\e[0m"
 else
-  echo -e "\e[90mSkipping 1280×800 screen config.\e[0m"
+  echo -e "\e[90mSkipping HDMI configuration.\e[0m"
 fi
 
 # ------------------------------------------------------------------------------
@@ -235,6 +232,11 @@ touch_transform_matrix="1 0 0 0 1 0"  # Default is normal
 echo
 echo "STEP 6: Display & Touch Rotation"
 if ask_user "Would you like to rotate your display with wlr-randr?"; then
+  if ! command -v wlr-randr &> /dev/null; then
+    echo -e "\e[31mERROR:\e[0m wlr-randr is not installed. Please install it first."
+    exit 1
+  fi
+
   echo -e "\nChoose a rotation angle:"
   echo "  1) normal (no rotation)"
   echo "  2) 90 degrees clockwise"
@@ -250,21 +252,14 @@ if ask_user "Would you like to rotate your display with wlr-randr?"; then
       ;;
     2)
       transform="90"
-      # Touch rotation: 90° => x -> y, y -> -x
-      #   LIBINPUT_CALIBRATION_MATRIX format: [ a b c; d e f ]
-      #   So for 90 deg: [ 0 -1 1; 1 0 0 ]
       touch_transform_matrix="0 -1 1 1 0 0"
       ;;
     3)
       transform="180"
-      # 180° => x -> -x+1, y -> -y+1
-      #   matrix: [ -1 0 1; 0 -1 1 ]
       touch_transform_matrix="-1 0 1 0 -1 1"
       ;;
     4)
       transform="270"
-      # 270° => x -> -y+1, y -> x
-      #   matrix: [ 0 1 0; -1 0 1 ]
       touch_transform_matrix="0 1 0 -1 0 1"
       ;;
     *)
@@ -273,14 +268,17 @@ if ask_user "Would you like to rotate your display with wlr-randr?"; then
       ;;
   esac
 
-  # For display rotation, we'll add lines to labwc autostart.
-  rotation_script="# Rotate display output (adjust 'HDMI-A-1' if needed)
-wlr-randr --output HDMI-A-1 --transform $transform
+  # Detect connected output dynamically
+  output=$(wlr-randr | grep -m 1 "connected" | awk '{print $1}')
+  if [ -z "$output" ]; then
+    echo -e "\e[31mERROR:\e[0m No connected output detected."
+    exit 1
+  fi
 
-# (Optional) If you have another output name for touch, you can rotate it similarly:
-# wlr-randr --output <TOUCH_OUTPUT> --transform $transform
+  rotation_script="# Rotate display output
+wlr-randr --output $output --transform $transform
 "
-  echo -e "\e[94mNote:\e[0m This uses 'HDMI-A-1' for the display. Adjust for your actual output."
+  echo -e "\e[94mNote:\e[0m Using detected output '$output'. Adjust if necessary."
 fi
 
 # Ask if we also want to create a udev rule for touch input rotation
@@ -289,7 +287,6 @@ if [ "$rotation_script" != "" ]; then
   if ask_user "Create a udev rule to apply the same rotation to a touchscreen device?"; then
     echo -e "\nPlease specify the name of your touchscreen device as recognized by the system."
     echo "You can find this by running 'sudo libinput list-devices' or 'xinput list' (on X)."
-    echo "Device 'Name' might be something like 'ILITEK Multi-Touch' or 'FT5406 memory based driver'."
     read -r -p "Enter EXACT device name (or leave blank to skip): " touch_device_name
 
     if [ -n "$touch_device_name" ]; then
@@ -491,7 +488,8 @@ if command -v chromium-browser &> /dev/null; then
 ${rotation_script}
 
 # Launch Chromium in kiosk mode
-chromium-browser --incognito \
+chromium-browser --kiosk \
+  --incognito \
   --force-dark-mode \
   --noerrdialogs \
   --disable-infobars \
@@ -500,7 +498,19 @@ chromium-browser --incognito \
   --check-for-update-interval=31536000 \
   --enable-features=OverlayScrollbar \
   --disable-restore-session-state \
-  --kiosk "$kiosk_url" &
+  --app="$kiosk_url" \
+  --enable-logging \
+  --log-level=2 \
+  --v=0 &
+
+export logfile="/home/$current_user/.config/chromium/chrome_debug.log"
+
+# Refreshes after a crash by watching logs
+tail -n 0 -F "$logfile" | while read LOGLINE &> /dev/null; do
+   echo "Refreshing after crash"
+   echo "Restarting at $(date) after a reported crash. Logline: ${LOGLINE}" >> /tmp/crashlog
+   [[ ("${LOGLINE}" == *"ERROR"*) || ("${LOGLINE}" == *"FATAL"*) ]] && /home/$current_user/scripts/refresh
+done
 EOL
 
     chmod +x "$labwc_autostart"
