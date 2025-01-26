@@ -1,0 +1,28 @@
+{
+    "scm.showHistoryGraph": false,
+    "terminal.integrated.fontFamily": "'JetBrainsMono Nerd Font Mono'",
+    "editor.fontFamily": "'JetBrainsMono Nerd Font Mono'",
+    "debug.allowBreakpointsEverywhere": true,
+    "editor.bracketPairColorization.independentColorPoolPerBracketType": true,
+    "editor.codeActionsOnSave": {
+        "source.fixAll": "explicit",
+        "source.organizeImports": "explicit"
+    },
+    "editor.formatOnPaste": true,
+    "editor.formatOnSave": true,
+    "editor.formatOnType": true,
+    "editor.guides.bracketPairs": true,
+    "editor.guides.bracketPairsHorizontal": false,
+    "files.exclude": {
+        "**/.vscode": true,
+        "**/Cargo.lock": true,
+        "**/target": true
+    },
+    "files.insertFinalNewline": true,
+    "files.trimTrailingWhitespace": true,
+    "git.confirmSync": false,
+    "editor.fontSize": 16,
+    "editor.fontLigatures": true,
+    "python.locator": "js",
+    "terminal.integrated.fontSize": 16
+}

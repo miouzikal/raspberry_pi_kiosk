@@ -1,4 +1,10 @@
-*.ipynb*
+*.ipynb
+*.log
+*.prof
+*.zip
 .DS_Store
+._*
+.env
+.ssh/
 .vscode
-__pycache__
+__pycache__/

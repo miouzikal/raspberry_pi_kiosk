@@ -1,0 +1,40 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+      - id: trailing-whitespace
+      - id: mixed-line-ending
+        args:
+          - --fix=lf
+      - id: end-of-file-fixer
+      - id: check-added-large-files
+      - id: file-contents-sorter
+        files: ^(\.gitignore)$
+      - id: check-yaml
+      - id: check-json
+  - repo: local
+    hooks:
+      - id: rust-fmt
+        name: rust format
+        description: Check if all files follow the rustfmt style
+        entry: cargo +nightly fmt
+        args: ["--"]
+        pass_filenames: false
+        types: [rust]
+        language: system
+      - id: rust-clippy
+        name: rust clippy
+        description: Check if the code follows the clippy lints
+        entry: cargo clippy
+        args: ["--all-targets", "--all-features", "--", "-D", "clippy::all", "-D", "clippy::pedantic","-D", "clippy::nursery", "-A", "warnings"]
+        pass_filenames: false
+        types: [rust]
+        language: system
+      - id: cargo-sort
+        name: cargo sort workspace
+        description: Checks and sort every crate in a workspace
+        entry: cargo sort
+        args: ["-w"]
+        pass_filenames: false
+        types: [rust]
+        language: system
