@@ -18,7 +18,7 @@ update_system() {
 # Function to install required packages
 install_packages() {
     echo "Installing required packages..."
-    sudo apt-get install --no-install-recommends vim xserver-xorg x11-xserver-utils openbox lightdm chromium-browser xinput fonts-noto-color-emoji xprintidle ddcutil xdotool bc sox jq python3-pygame python3-numpy dkms git -y
+    sudo apt-get install --no-install-recommends vim xserver-xorg x11-xserver-utils openbox lightdm chromium-browser xinput fonts-noto-color-emoji xprintidle ddcutil xdotool bc sox jq python3-pygame python3-numpy dkms git fbi -y
 }
 
 # Function to configure LightDM
@@ -93,12 +93,21 @@ configure_hdmi() {
 disable_boot_messages() {
     echo "Disabling boot messages..."
     sed -i "s/tty1/tty3/" "/boot/firmware/cmdline.txt"
-    if ! grep -q "quiet splash loglevel=0 logo.nologo vt.global_cursor_default=0" "/boot/firmware/cmdline.txt"; then
-        sudo tee -a "/boot/firmware/cmdline.txt" <<<" quiet splash loglevel=0 logo.nologo vt.global_cursor_default=0"
+    if ! grep -q "quiet splash loglevel=0 logo.nologo vt.global_cursor_default=0 fbcon=rotate:3" "/boot/firmware/cmdline.txt"; then
+        sudo tee -a "/boot/firmware/cmdline.txt" <<<" quiet splash loglevel=0 logo.nologo vt.global_cursor_default=0 fbcon=rotate:3"
     fi
     if ! grep -q "^disable_splash=1" "/boot/firmware/config.txt"; then
         sudo tee -a "/boot/firmware/config.txt" <<<"disable_splash=1"
     fi
+
+    # install splash screen
+    sudo mkdir -p /opt/splash
+    cp ./splash.png /opt/splash/splash.png
+
+    # install splash service
+    sudo cp ./scripts/splash/splash.service /etc/systemd/system/splash.service
+    sudo systemctl enable splash.service
+    sudo systemctl start splash.service
 }
 
 # Function to create the audio trigger script

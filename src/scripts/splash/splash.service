@@ -1,0 +1,12 @@
+[Unit]
+Description=Splash Screen
+After=local-fs.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/fbi -d /dev/fb0 --noverbose -a /opt/splash/splash.png
+StandardInput=tty
+StandardOutput=tty
+
+[Install]
+WantedBy=multi-user.target
