@@ -75,13 +75,15 @@ show_progress() {
 # Confirmation Prompt
 # -----------------------------------------------------------------------------
 confirm() {
-  local prompt="$1"
-  echo -e "${BOLD}${prompt}${COLOR_RESET} [Y/n]"
-  read -r answer
-  case "$answer" in
-    [Yy]* | "") return 0 ;;
-    *) return 1 ;;
-  esac
+    local prompt="$1"
+    while true; do
+        read -p "${BOLD}${prompt}${COLOR_RESET} [Y/n] " answer
+        case "$answer" in
+            [Yy]* | "") return 0 ;;
+            [Nn]*) return 1 ;;
+            *) echo -e "${COLOR_RED}Invalid input. Please enter Y or N.${COLOR_RESET}" ;;
+        esac
+    done
 }
 
 # -----------------------------------------------------------------------------
