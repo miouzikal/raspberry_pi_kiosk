@@ -58,11 +58,10 @@ stop_spinner() {
 # -----------------------------------------------------------------------------
 show_progress() {
   clear
-  echo -e "${BOLD}${COLOR_BLUE}=== Kiosk Setup Progress ===${COLOR_RESET}"
+  echo -e "${BOLD}${COLOR_BLUE}=== Kiosk Setup Progress ===${COLOR_RESET}\n"
 
   # Completed steps
   if [[ ${#STEPS_COMPLETED[@]} -gt 0 ]]; then
-    echo
     for step in "${STEPS_COMPLETED[@]}"; do
       echo -e " ${COLOR_GREEN}✓${COLOR_RESET} $step"
     done
@@ -70,7 +69,6 @@ show_progress() {
 
   # Current step
   if [[ -n "$CURRENT_STEP" ]]; then
-    echo
     echo -e "${COLOR_YELLOW}=> $CURRENT_STEP${COLOR_RESET}"
     echo
   fi

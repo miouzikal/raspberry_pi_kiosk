@@ -31,6 +31,7 @@ if ! grep -q "fbcon=rotate:" "$CMDLINE_FILE"; then
         echo " 1. Landscape Inverted - USB ports on the left"
         echo " 2. Portrait - USB ports on the top"
         echo " 3. Portrait Inverted - USB ports on the bottom"
+        echo -n -e "\nScreen orientation: "
         read answer
         case "$answer" in
         0 | 1 | 2 | 3)
@@ -43,6 +44,7 @@ if ! grep -q "fbcon=rotate:" "$CMDLINE_FILE"; then
             ;;
         esac
     done
+    show_progress
 fi
 
 # Determine which parameters need to be added
@@ -64,7 +66,7 @@ echo -e "${BOLD}The following parameters will be added to $CMDLINE_FILE:${COLOR_
 for parameter in "${parameters_to_add[@]}"; do
     echo "  - $parameter"
 done
-echo "\n"
+echo
 
 if ! confirm "Proceed with adding parameters?"; then
     echo -e "${COLOR_RED}User canceled adding parameters.${COLOR_RESET}"

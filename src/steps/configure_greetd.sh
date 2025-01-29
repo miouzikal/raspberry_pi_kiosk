@@ -21,13 +21,18 @@ if [[ ! -f "$TEMPLATE_FILE" ]]; then
 fi
 
 # Show the content of the template
-echo -e "${BOLD}Configuring greetd will install the following configuration:${COLOR_RESET}"
 NEW_CONFIG=$(sed "s|___CURRENT_USER___|$(whoami)|g" "$TEMPLATE_FILE")
-echo "------------------------------------------------------------"
-echo "$NEW_CONFIG"
-echo "------------------------------------------------------------\n"
+CONFIRM_MESSAGE=$(cat <<EOF
+${BOLD}The following configuration will be written to '$TARGET_FILE':${COLOR_RESET}
+------------------------------------------------------------
+$NEW_CONFIG
+------------------------------------------------------------
 
-if ! confirm "Proceed with configuring greetd?"; then
+Do you want to configure and start greetd?
+EOF
+)
+
+if ! confirm "$CONFIRM_MESSAGE"; then
   echo -e "${COLOR_RED}User canceled greetd configuration.${COLOR_RESET}"
   $IS_SOURCED && return 1 || exit 1
 fi
@@ -35,9 +40,9 @@ fi
 show_progress
 
 # Write the new configuration
-start_spinner "Configuring greetd"
+start_spinner "Configuring and starting greetd"
 echo "$NEW_CONFIG" | sudo tee "$TARGET_FILE" > /dev/null
-sudo systemctl enable greetd > /dev/null
+sudo systemctl enable greetd > /dev/null 2>&1
 sudo systemctl set-default graphical.target > /dev/null
 sudo systemctl start greetd > /dev/null
 stop_spinner

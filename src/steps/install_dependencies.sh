@@ -42,7 +42,7 @@ echo -e "${BOLD}The following packages will be installed:${COLOR_RESET}"
 for pkg in "${packages_to_install[@]}"; do
   echo "  - $pkg"
 done
-echo "\n"
+echo
 
 if ! confirm "Proceed with installing packages?"; then
   echo -e "${COLOR_RED}User canceled prerequisites installation.${COLOR_RESET}"
