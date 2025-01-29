@@ -93,6 +93,7 @@ confirm() {
 run_step() {
   local step_title="$1"
   local step_script="$2"
+  local mandatory="${3:-false}"  # Default to false if not provided
 
   CURRENT_STEP="$step_title"
   show_progress
@@ -100,24 +101,36 @@ run_step() {
   # If the step script doesn't exist, skip
   if [[ ! -f "$step_script" ]]; then
     echo -e "${COLOR_RED}Script $step_script not found. Skipping.${COLOR_RESET}"
+    STEPS_COMPLETED+=("${step_title} (Skipped - Not Found)")
     sleep 2
     return
   fi
 
-  # Confirm with user?
-  if ! confirm "Proceed with '$step_title'?"; then
-    echo -e "${COLOR_RED}Skipped '${step_title}'.${COLOR_RESET}"
+  # Modify prompt to indicate mandatory steps
+  local prompt="Proceed with '$step_title'"
+  if [[ "$mandatory" == "true" ]]; then
+    prompt="${COLOR_RED}Proceed with '$step_title' (MANDATORY)?${COLOR_RESET}"
+  fi
+
+  # Confirm with user
+  if ! confirm "$prompt"; then
+    echo -e "${COLOR_YELLOW}Skipped '${step_title}'.${COLOR_RESET}"
+    STEPS_COMPLETED+=("${step_title} (Skipped)")
+
+    if [[ "$mandatory" == "true" ]]; then
+      echo -e "${COLOR_RED}This step is mandatory. Aborting setup.${COLOR_RESET}"
+      exit 1
+    fi
     sleep 1
     return
   fi
 
   # Run the step
-  # The step script can also do its own user prompts if needed.
   bash "$step_script"
   if [[ $? -ne 0 ]]; then
-    echo -e "${COLOR_RED}'$step_title' failed or was aborted.${COLOR_RESET}"
-    # You can decide to exit here or continue
-    # exit 1
+    echo -e "${COLOR_RED}Step '$step_title' failed."
+    echo -e "- Aborting setup.${COLOR_RESET}"
+    exit 1
   else
     STEPS_COMPLETED+=("$step_title")
   fi
