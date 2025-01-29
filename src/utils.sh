@@ -133,7 +133,7 @@ run_step() {
   # Run the step
   bash "$step_script"
   if [[ $? -ne 0 ]]; then
-    echo -e "${COLOR_RED}Step '$step_title' failed."
+    echo -e "${COLOR_RED}Step '$step_title' did not complete successfully.${COLOR_RESET}"
     echo -e "- Aborting setup.${COLOR_RESET}"
     exit 1
   else

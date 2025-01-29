@@ -35,12 +35,9 @@ main() {
   # (Add or remove as needed)
   run_step "System Update & Upgrade"   "$(dirname "$0")/steps/system_update.sh"
   run_step "Install Dependencies"      "$(dirname "$0")/steps/install_dependencies.sh"  true
-#   run_step "Configure Greetd"          "$(dirname "$0")/steps/configure_greetd.sh"
+  run_step "Configure Greetd"          "$(dirname "$0")/steps/configure_greetd.sh"      true
 
-#   # Finish / summary step
-  run_step "Wrap Up"                   "$(dirname "$0")/steps/wrap_up.sh"
-
-  echo -e "\n${COLOR_GREEN}All steps completed!${COLOR_RESET}"
+  bash "$(dirname "$0")/steps/wrap_up.sh"
 }
 
 main

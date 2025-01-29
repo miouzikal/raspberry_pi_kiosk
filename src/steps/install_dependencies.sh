@@ -52,8 +52,7 @@ for pkg in "${packages_to_install[@]}"; do
 done
 echo
 if ! confirm "Proceed with installing packages?"; then
-  echo -e "${COLOR_RED}User canceled installation.${COLOR_RESET}"
-  echo -e "- Setup cannot continue without installing dependencies."
+  echo -e "${COLOR_RED}User canceled prerequisites installation.${COLOR_RESET}"
   exit 1
 fi
 
