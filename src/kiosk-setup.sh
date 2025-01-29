@@ -38,7 +38,7 @@ main() {
 #   run_step "Configure Greetd"          "$(dirname "$0")/steps/configure_greetd.sh"
 
 #   # Finish / summary step
-#   run_step "Finish"                    "$(dirname "$0")/steps/finish_setup.sh"
+  run_step "Wrap Up"                   "$(dirname "$0")/steps/wrap_up.sh"
 
   echo -e "\n${COLOR_GREEN}All steps completed!${COLOR_RESET}"
 }
