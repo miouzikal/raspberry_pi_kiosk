@@ -16,7 +16,7 @@ CURRENT_STEP="Install Dependencies"
 show_progress
 
 # List of packages
-packages=(
+prerequisites=(
     chromium-browser \
     git \
     greetd \
@@ -28,21 +28,21 @@ packages=(
 )
 
 # create list of packages to install
-pkgs_to_install=()
-for pkg in "${packages[@]}"; do
+packages_to_install=()
+for pkg in "${prerequisites[@]}"; do
   if ! dpkg -l "$pkg" &>/dev/null; then
-    pkgs_to_install+=("$pkg")
+    packages_to_install+=("$pkg")
   fi
 done
 
-if [[ ${#pkgs_to_install[@]} -eq 0 ]]; then
+if [[ ${#packages_to_install[@]} -eq 0 ]]; then
   echo -e "${COLOR_GREEN}All dependencies are already installed.${COLOR_RESET}"
   sleep 1
   exit 0
 fi
 
 echo -e "${BOLD}The following packages will be installed:${COLOR_RESET}"
-for pkg in "${packages[@]}"; do
+for pkg in "${packages_to_install[@]}"; do
   echo "  - $pkg"
 done
 echo
@@ -53,7 +53,7 @@ if ! confirm "Proceed with installing packages?"; then
 fi
 
 start_spinner "Installing dependencies"
-sudo apt-get install --no-install-recommends -y "${packages[@]}" > /dev/null 2>&1
+sudo apt-get install --no-install-recommends -y "${packages_to_install[@]}" > /dev/null 2>&1
 stop_spinner
 
 echo -e "${COLOR_GREEN}Dependency installation complete!${COLOR_RESET}"
