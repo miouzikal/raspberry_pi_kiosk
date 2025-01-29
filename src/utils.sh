@@ -66,7 +66,7 @@ show_progress() {
   # Current step
   if [[ -n "$CURRENT_STEP" ]]; then
     echo
-    echo -e "${COLOR_YELLOW}--- Now: $CURRENT_STEP${COLOR_RESET}"
+    echo -e "${COLOR_YELLOW}=> $CURRENT_STEP${COLOR_RESET}"
     echo
   fi
 }
