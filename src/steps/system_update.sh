@@ -24,8 +24,7 @@ start_spinner "Updating package lists"
 sudo apt-get update &>/dev/null
 stop_spinner
 
-echo -e "${BOLD}Would you like to fully upgrade the system?${COLOR_RESET}"
-if ! confirm "Proceed with full system upgrade?"; then
+if ! confirm "Would you like to fully upgrade the system?"; then
   echo -e "${COLOR_RED}User skipped system upgrade.${COLOR_RESET}"
   exit 0
 fi
