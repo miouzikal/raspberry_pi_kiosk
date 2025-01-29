@@ -24,16 +24,16 @@ CMDLINE_FILE="/boot/firmware/cmdline.txt"
 
 # Ask user for screen orientation
 echo -e "${BOLD}How is the screen oriented?${COLOR_RESET}"
-echo " 1. Landscape - USB ports on the right (default)"
-echo " 2. Landscape Inverted - USB ports on the left"
-echo " 3. Portrait - USB ports on the bottom"
-echo " 4. Portrait Inverted - USB ports on the top"
+echo " 0. Landscape - USB ports on the right (default)"
+echo " 1. Landscape Inverted - USB ports on the left"
+echo " 2. Portrait - USB ports on the top"
+echo " 3. Portrait Inverted - USB ports on the bottom"
 read answer
 case "$answer" in
-    1 | "") ORIENTATION="0" ;;
+    0 | "") ORIENTATION="0" ;;
+    1) ORIENTATION="1" ;;
     2) ORIENTATION="2" ;;
-    3) ORIENTATION="1" ;;
-    4) ORIENTATION="3" ;;
+    3) ORIENTATION="3" ;;
     *) echo -e "${COLOR_RED}Invalid input. Please enter a number 1-4.${COLOR_RESET}" ;;
 esac
 
