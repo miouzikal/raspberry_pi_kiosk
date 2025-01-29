@@ -104,7 +104,7 @@ run_step() {
   CURRENT_STEP="$step_title"
   show_progress
 
-  # Skip if script doesn't exist
+  # Handle missing scripts immediately
   if [[ ! -f "$step_script" ]]; then
     echo -e "${COLOR_RED}Script $step_script not found. Skipping.${COLOR_RESET}"
     STEPS_COMPLETED+=("${step_title} (Skipped - Not Found)")
@@ -114,40 +114,32 @@ run_step() {
 
   # Build confirmation prompt
   local prompt="Proceed with '$step_title'?"
-  if [[ "$mandatory" == "true" ]]; then
-    prompt="${BOLD}Proceed with '$step_title' (Required)?${COLOR_RESET}"
+  [[ "$mandatory" == "true" ]] && prompt="${BOLD}Proceed with '$step_title' (Required)?${COLOR_RESET}"
+
+  # Determine if we should proceed
+  local proceed=false
+  if [[ "$skip_confirm" == "true" ]]; then
+    proceed=true
+  else
+    confirm "$prompt" && proceed=true
   fi
 
-  # Skip confirmation if requested
-  if [[ "$skip_confirm" == "true" ]]; then
-    source "$step_script"
-    if [[ $? -ne 0 ]]; then
-      echo -e "${COLOR_RED}Step '$step_title' failed.${COLOR_RESET}"
-      if [[ "$mandatory" == "true" ]]; then
-        echo -e "${COLOR_RED}This step is mandatory. Aborting setup.${COLOR_RESET}"
-        exit 1
-      fi
-    else
-      STEPS_COMPLETED+=("$step_title")
+  # Handle user skip
+  if ! $proceed; then
+    echo -e "${COLOR_YELLOW}Skipped '${step_title}'.${COLOR_RESET}"
+    STEPS_COMPLETED+=("${step_title} (Skipped)")
+    if [[ "$mandatory" == "true" ]]; then
+      echo -e "${COLOR_RED}This step is mandatory. Aborting setup.${COLOR_RESET}"
+      exit 1
     fi
     return
   fi
 
-  # Ask for confirmation
-  if confirm "$prompt"; then
-    source "$step_script"
-    if [[ $? -ne 0 ]]; then
-      echo -e "${COLOR_RED}Step '$step_title' failed.${COLOR_RESET}"
-      if [[ "$mandatory" == "true" ]]; then
-        echo -e "${COLOR_RED}This step is mandatory. Aborting setup.${COLOR_RESET}"
-        exit 1
-      fi
-    else
-      STEPS_COMPLETED+=("$step_title")
-    fi
+  # Execute the step
+  if source "$step_script"; then
+    STEPS_COMPLETED+=("$step_title")
   else
-    echo -e "${COLOR_YELLOW}Skipped '${step_title}'.${COLOR_RESET}"
-    STEPS_COMPLETED+=("${step_title} (Skipped)")
+    echo -e "${COLOR_RED}Step '$step_title' failed.${COLOR_RESET}"
     if [[ "$mandatory" == "true" ]]; then
       echo -e "${COLOR_RED}This step is mandatory. Aborting setup.${COLOR_RESET}"
       exit 1
