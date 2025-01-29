@@ -1,19 +1,11 @@
 #!/usr/bin/env bash
-#
-# install_dependencies.sh
-# Installs required kiosk packages.
-#
-# Standalone usage:
-#   ./install_dependencies.sh
-#   (Ensure you source ../utils.sh or run in an environment where it's loaded.)
 
-# Source the utils if not running from main script:
+# Determine if the script is being sourced or executed
+[[ "${BASH_SOURCE[0]}" != "$0" ]] && IS_SOURCED=true || IS_SOURCED=false
+
+# Ensure utils.sh is sourced
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-# If utils.sh is not already in the environment, source it:
-if [[ -z "$COLOR_BLUE" ]]; then
-  # Attempt to load from parent directory
-  source "$SCRIPT_DIR/../utils.sh"
-fi
+declare -p STEPS_COMPLETED &>/dev/null || source "$SCRIPT_DIR/../utils.sh"
 
 # Step logic
 CURRENT_STEP="Install Dependencies"
@@ -32,7 +24,7 @@ PREREQUISITES=(
   wlr-randr
 )
 
-# create list of packages to install
+# Create list of packages to install
 packages_to_install=()
 for pkg in "${PREREQUISITES[@]}"; do
   if ! dpkg -l "$pkg" &>/dev/null; then
@@ -43,7 +35,7 @@ done
 if [[ ${#packages_to_install[@]} -eq 0 ]]; then
   echo -e "${COLOR_GREEN}All dependencies are already installed.${COLOR_RESET}"
   sleep 1
-  exit 0
+  $IS_SOURCED && return 0 || exit 0
 fi
 
 echo -e "${BOLD}The following packages will be installed:${COLOR_RESET}"
@@ -53,7 +45,7 @@ done
 echo
 if ! confirm "Proceed with installing packages?"; then
   echo -e "${COLOR_RED}User canceled prerequisites installation.${COLOR_RESET}"
-  exit 1
+  $IS_SOURCED && return 1 || exit 1
 fi
 
 start_spinner "Installing dependencies"
@@ -62,4 +54,4 @@ stop_spinner
 
 echo -e "${COLOR_GREEN}Dependency installation complete!${COLOR_RESET}"
 sleep 1
-exit 0
+$IS_SOURCED && return 0 || exit 0

@@ -33,12 +33,12 @@ main() {
 
   # Let's run each step in a chain:
   # (Add or remove as needed)
-  run_step "System Update & Upgrade"   "$(dirname "$0")/steps/system_update.sh"
-  run_step "Install Dependencies"      "$(dirname "$0")/steps/install_dependencies.sh"  true
-  run_step "Configure Quiet Boot"      "$(dirname "$0")/steps/configure_quiet_boot.sh"  true
-  run_step "Configure Greetd"          "$(dirname "$0")/steps/configure_greetd.sh"      true
+  run_step "System Update & Upgrade" "$(dirname "$0")/steps/system_update.sh"
+  run_step "Install Dependencies" "$(dirname "$0")/steps/install_dependencies.sh" true
+  run_step "Configure Quiet Boot" "$(dirname "$0")/steps/configure_quiet_boot.sh" true
+  run_step "Configure Greetd" "$(dirname "$0")/steps/configure_greetd.sh" true
 
-  bash "$(dirname "$0")/steps/wrap_up.sh"
+  run_step "Finalize" "$(dirname "$0")/steps/wrap_up.sh" true true
 }
 
 main

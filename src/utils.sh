@@ -21,7 +21,7 @@ SPINNER=('⣾' '⣽' '⣻' '⢿' '⡿' '⣟' '⣯' '⣷')
 # -----------------------------------------------------------------------------
 # Shared Variables
 # -----------------------------------------------------------------------------
-declare -a STEPS_COMPLETED  # Stores list of completed steps
+declare -a STEPS_COMPLETED # Stores list of completed steps
 CURRENT_STEP=""
 SPIN_PID=0
 SPIN_MSG=""
@@ -32,7 +32,7 @@ SPIN_MSG=""
 spinner() {
   local i=0
   while :; do
-    i=$(( (i+1) % 8 ))
+    i=$(((i + 1) % 8))
     printf "\r${COLOR_YELLOW}%s${COLOR_RESET} %s" "${SPINNER[$i]}" "$SPIN_MSG"
     sleep 0.1
   done
@@ -50,7 +50,7 @@ stop_spinner() {
     kill -9 "$SPIN_PID" 2>/dev/null || true
   fi
   printf "\r"
-  tput el  # clear line
+  tput el # clear line
 }
 
 # -----------------------------------------------------------------------------
@@ -80,16 +80,16 @@ show_progress() {
 # Confirmation Prompt
 # -----------------------------------------------------------------------------
 confirm() {
-    local prompt="$1"
-    while true; do
-        echo -n -e "${BOLD}${prompt}${COLOR_RESET} [Y/n] "
-        read answer
-        case "$answer" in
-            [Yy]* | "") return 0 ;;
-            [Nn]*) return 1 ;;
-            *) echo -e "${COLOR_RED}Invalid input. Please enter Y or N.${COLOR_RESET}" ;;
-        esac
-    done
+  local prompt="$1"
+  while true; do
+    echo -n -e "${BOLD}${prompt}${COLOR_RESET} [Y/n] "
+    read answer
+    case "$answer" in
+    [Yy]* | "") return 0 ;;
+    [Nn]*) return 1 ;;
+    *) echo -e "${COLOR_RED}Invalid input. Please enter Y or N.${COLOR_RESET}" ;;
+    esac
+  done
 }
 
 # -----------------------------------------------------------------------------
@@ -98,12 +98,13 @@ confirm() {
 run_step() {
   local step_title="$1"
   local step_script="$2"
-  local mandatory="${3:-false}"  # Default to false if not provided
+  local mandatory="${3:-false}"
+  local skip_confirm="${4:-false}"
 
   CURRENT_STEP="$step_title"
   show_progress
 
-  # If the step script doesn't exist, skip
+  # Skip if script doesn't exist
   if [[ ! -f "$step_script" ]]; then
     echo -e "${COLOR_RED}Script $step_script not found. Skipping.${COLOR_RESET}"
     STEPS_COMPLETED+=("${step_title} (Skipped - Not Found)")
@@ -111,33 +112,46 @@ run_step() {
     return
   fi
 
-  # Modify prompt to indicate mandatory steps
-  local prompt="Proceed with '$step_title'"
+  # Build confirmation prompt
+  local prompt="Proceed with '$step_title'?"
   if [[ "$mandatory" == "true" ]]; then
     prompt="${BOLD}Proceed with '$step_title' (Required)?${COLOR_RESET}"
   fi
 
-  # Confirm with user
-  if ! confirm "$prompt"; then
+  # Skip confirmation if requested
+  if [[ "$skip_confirm" == "true" ]]; then
+    source "$step_script"
+    if [[ $? -ne 0 ]]; then
+      echo -e "${COLOR_RED}Step '$step_title' failed.${COLOR_RESET}"
+      if [[ "$mandatory" == "true" ]]; then
+        echo -e "${COLOR_RED}This step is mandatory. Aborting setup.${COLOR_RESET}"
+        exit 1
+      fi
+    else
+      STEPS_COMPLETED+=("$step_title")
+    fi
+    return
+  fi
+
+  # Ask for confirmation
+  if confirm "$prompt"; then
+    source "$step_script"
+    if [[ $? -ne 0 ]]; then
+      echo -e "${COLOR_RED}Step '$step_title' failed.${COLOR_RESET}"
+      if [[ "$mandatory" == "true" ]]; then
+        echo -e "${COLOR_RED}This step is mandatory. Aborting setup.${COLOR_RESET}"
+        exit 1
+      fi
+    else
+      STEPS_COMPLETED+=("$step_title")
+    fi
+  else
     echo -e "${COLOR_YELLOW}Skipped '${step_title}'.${COLOR_RESET}"
     STEPS_COMPLETED+=("${step_title} (Skipped)")
-
     if [[ "$mandatory" == "true" ]]; then
       echo -e "${COLOR_RED}This step is mandatory. Aborting setup.${COLOR_RESET}"
       exit 1
     fi
-    sleep 1
-    return
-  fi
-
-  # Run the step
-  bash "$step_script"
-  if [[ $? -ne 0 ]]; then
-    echo -e "${COLOR_RED}Step '$step_title' did not complete successfully.${COLOR_RESET}"
-    echo -e "- Aborting setup.${COLOR_RESET}"
-    exit 1
-  else
-    STEPS_COMPLETED+=("$step_title")
   fi
 }
 

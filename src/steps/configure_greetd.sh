@@ -1,19 +1,11 @@
 #!/usr/bin/env bash
-#
-# configure_greetd.sh
-# Configures greetd using a template file.
-#
-# Standalone usage:
-#   ./install_dependencies.sh
-#   (Ensure you source ../utils.sh or run in an environment where it's loaded.)
 
-# Source the utils if not running from main script:
+# Determine if the script is being sourced or executed
+[[ "${BASH_SOURCE[0]}" != "$0" ]] && IS_SOURCED=true || IS_SOURCED=false
+
+# Ensure utils.sh is sourced
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-# If utils.sh is not already in the environment, source it:
-if [[ -z "$COLOR_BLUE" ]]; then
-  # Attempt to load from parent directory
-  source "$SCRIPT_DIR/../utils.sh"
-fi
+declare -p STEPS_COMPLETED &>/dev/null || source "$SCRIPT_DIR/../utils.sh"
 
 # Step logic
 CURRENT_STEP="Configure Greetd"
@@ -25,7 +17,7 @@ TARGET_FILE="/etc/greetd/config.toml"
 
 if [[ ! -f "$TEMPLATE_FILE" ]]; then
   echo -e "${COLOR_RED}Template file not found: $TEMPLATE_FILE${COLOR_RESET}"
-  exit 1
+  $IS_SOURCED && return 1 || exit 1
 fi
 
 # Show the content of the template
@@ -37,7 +29,7 @@ echo "------------------------------------------------------------"
 
 if ! confirm "Proceed with configuring greetd?"; then
   echo -e "${COLOR_RED}User canceled greetd configuration.${COLOR_RESET}"
-  exit 1
+  $IS_SOURCED && return 1 || exit 1
 fi
 
 # Write the new configuration
@@ -50,5 +42,5 @@ stop_spinner
 
 echo -e "${COLOR_GREEN}greetd configured successfully!${COLOR_RESET}"
 sleep 1
-exit 0
+$IS_SOURCED && return 0 || exit 0
 

@@ -1,19 +1,11 @@
 #!/usr/bin/env bash
-#
-# configure_quiet_boot.sh
-# Configures Raspberry Pi to boot without text output.
-#
-# Standalone usage:
-#   ./configure_quiet_boot.sh
-#   (Ensure you source ../utils.sh or run in an environment where it's loaded.)
 
-# Source the utils if not running from main script:
+# Determine if the script is being sourced or executed
+[[ "${BASH_SOURCE[0]}" != "$0" ]] && IS_SOURCED=true || IS_SOURCED=false
+
+# Ensure utils.sh is sourced
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-# If utils.sh is not already in the environment, source it:
-if [[ -z "$COLOR_BLUE" ]]; then
-    # Attempt to load from parent directory
-    source "$SCRIPT_DIR/../utils.sh"
-fi
+declare -p STEPS_COMPLETED &>/dev/null || source "$SCRIPT_DIR/../utils.sh"
 
 # Step logic
 CURRENT_STEP="Configure Quiet Boot"
@@ -64,7 +56,7 @@ done
 if [[ ${#parameters_to_add[@]} -eq 0 ]]; then
     echo -e "${COLOR_GREEN}All quiet boot parameters are already set.${COLOR_RESET}"
     sleep 1
-    exit 0
+    $IS_SOURCED && return 0 || exit 0
 fi
 
 # Add parameters to the file
@@ -75,7 +67,7 @@ done
 echo
 if ! confirm "Proceed with adding parameters?"; then
     echo -e "${COLOR_RED}User canceled adding parameters.${COLOR_RESET}"
-    exit 1
+    $IS_SOURCED && return 1 || exit 1
 fi
 
 start_spinner "Adding parameters to $CMDLINE_FILE"
@@ -84,4 +76,4 @@ stop_spinner
 
 echo -e "${COLOR_GREEN}Quiet boot configured successfully!${COLOR_RESET}"
 sleep 1
-exit 0
+$IS_SOURCED && return 0 || exit 0
