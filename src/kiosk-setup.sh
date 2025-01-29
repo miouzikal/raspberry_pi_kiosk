@@ -33,8 +33,8 @@ main() {
 
   # Let's run each step in a chain:
   # (Add or remove as needed)
-#   run_step "System Update & Upgrade"   "$(dirname "$0")/steps/system_update.sh"
-#   run_step "Install Dependencies"      "$(dirname "$0")/steps/install_dependencies.sh"
+  run_step "System Update & Upgrade"   "$(dirname "$0")/steps/system_update.sh"
+  run_step "Install Dependencies"      "$(dirname "$0")/steps/install_dependencies.sh"
 #   run_step "Configure Greetd"          "$(dirname "$0")/steps/configure_greetd.sh"
 
 #   # Finish / summary step
