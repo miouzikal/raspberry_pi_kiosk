@@ -32,6 +32,7 @@ fi
 
 start_spinner "Upgrading system packages"
 sudo apt-get upgrade -y &>/dev/null
+stop_spinner
 
 echo -e "${COLOR_GREEN}System update & upgrade completed successfully!${COLOR_RESET}"
 sleep 1
