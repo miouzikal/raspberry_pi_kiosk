@@ -56,7 +56,7 @@ stop_spinner() {
 # -----------------------------------------------------------------------------
 show_progress() {
   clear
-  echo -e "${BOLD}${COLOR_BLUE}=== Kiosk Setup Progress ===${COLOR_RESET}\n"
+  echo -e "${BOLD}${COLOR_BLUE}=== Kiosk Setup Progress ===${COLOR_RESET}"
 
   # Completed steps
   for step in "${STEPS_COMPLETED[@]}"; do
