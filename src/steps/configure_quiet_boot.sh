@@ -55,7 +55,7 @@ done
 
 if [[ ${#parameters_to_add[@]} -eq 0 ]]; then
     echo -e "${COLOR_GREEN}All quiet boot parameters are already set.${COLOR_RESET}"
-    sleep 1
+    sleep 3
     $IS_SOURCED && return 0 || exit 0
 fi
 
@@ -64,16 +64,19 @@ echo -e "${BOLD}The following parameters will be added to $CMDLINE_FILE:${COLOR_
 for parameter in "${parameters_to_add[@]}"; do
     echo "  - $parameter"
 done
-echo
+echo "\n"
+
 if ! confirm "Proceed with adding parameters?"; then
     echo -e "${COLOR_RED}User canceled adding parameters.${COLOR_RESET}"
     $IS_SOURCED && return 1 || exit 1
 fi
+
+show_progress
 
 start_spinner "Adding parameters to $CMDLINE_FILE"
 sudo sed -i "s/$/ ${parameters_to_add[*]}/" "$CMDLINE_FILE"
 stop_spinner
 
 echo -e "${COLOR_GREEN}Quiet boot configured successfully!${COLOR_RESET}"
-sleep 1
+sleep 3
 $IS_SOURCED && return 0 || exit 0

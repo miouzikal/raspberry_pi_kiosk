@@ -25,12 +25,14 @@ echo -e "${BOLD}Configuring greetd will install the following configuration:${CO
 NEW_CONFIG=$(sed "s|___CURRENT_USER___|$(whoami)|g" "$TEMPLATE_FILE")
 echo "------------------------------------------------------------"
 echo "$NEW_CONFIG"
-echo "------------------------------------------------------------"
+echo "------------------------------------------------------------\n"
 
 if ! confirm "Proceed with configuring greetd?"; then
   echo -e "${COLOR_RED}User canceled greetd configuration.${COLOR_RESET}"
   $IS_SOURCED && return 1 || exit 1
 fi
+
+show_progress
 
 # Write the new configuration
 start_spinner "Configuring greetd"
@@ -41,6 +43,6 @@ sudo systemctl start greetd > /dev/null
 stop_spinner
 
 echo -e "${COLOR_GREEN}greetd configured successfully!${COLOR_RESET}"
-sleep 1
+sleep 3
 $IS_SOURCED && return 0 || exit 0
 

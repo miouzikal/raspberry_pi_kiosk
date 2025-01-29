@@ -21,10 +21,12 @@ if ! confirm "Would you like to fully upgrade the system?"; then
   $IS_SOURCED && return 0 || exit 0
 fi
 
+show_progress
+
 start_spinner "Upgrading system packages"
 sudo apt-get upgrade -y &>/dev/null
 stop_spinner
 
 echo -e "${COLOR_GREEN}System update & upgrade completed successfully!${COLOR_RESET}"
-sleep 1
+sleep 3
 $IS_SOURCED && return 0 || exit 0
