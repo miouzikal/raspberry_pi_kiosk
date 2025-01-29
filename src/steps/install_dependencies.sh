@@ -21,20 +21,20 @@ CURRENT_STEP="Install Dependencies"
 show_progress
 
 # List of packages
-prerequisites=(
-    chromium-browser \
-    git \
-    greetd \
-    labwc \
-    libinput-tools \
-    seatd \
-    vim \
-    wlr-randr
+PREREQUISITES=(
+  chromium-browser
+  git
+  greetd
+  labwc
+  libinput-tools
+  seatd
+  vim
+  wlr-randr
 )
 
 # create list of packages to install
 packages_to_install=()
-for pkg in "${prerequisites[@]}"; do
+for pkg in "${PREREQUISITES[@]}"; do
   if ! dpkg -l "$pkg" &>/dev/null; then
     packages_to_install+=("$pkg")
   fi
@@ -57,7 +57,7 @@ if ! confirm "Proceed with installing packages?"; then
 fi
 
 start_spinner "Installing dependencies"
-sudo apt-get install --no-install-recommends -y "${packages_to_install[@]}" > /dev/null 2>&1
+sudo apt-get install --no-install-recommends -y "${packages_to_install[@]}" >/dev/null 2>&1
 stop_spinner
 
 echo -e "${COLOR_GREEN}Dependency installation complete!${COLOR_RESET}"

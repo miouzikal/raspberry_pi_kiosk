@@ -11,8 +11,8 @@
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # If utils.sh is not already in the environment, source it:
 if [[ -z "$COLOR_BLUE" ]]; then
-  # Attempt to load from parent directory
-  source "$SCRIPT_DIR/../utils.sh"
+    # Attempt to load from parent directory
+    source "$SCRIPT_DIR/../utils.sh"
 fi
 
 # Step logic
@@ -22,44 +22,55 @@ show_progress
 
 CMDLINE_FILE="/boot/firmware/cmdline.txt"
 
-# Ask user for screen orientation
-echo -e "${BOLD}How is the screen oriented?${COLOR_RESET}"
-echo " 0. Landscape - USB ports on the right (default)"
-echo " 1. Landscape Inverted - USB ports on the left"
-echo " 2. Portrait - USB ports on the top"
-echo " 3. Portrait Inverted - USB ports on the bottom"
-read answer
-case "$answer" in
-    0 | "") ORIENTATION="0" ;;
-    1) ORIENTATION="1" ;;
-    2) ORIENTATION="2" ;;
-    3) ORIENTATION="3" ;;
-    *) echo -e "${COLOR_RED}Invalid input. Please enter a number 1-4.${COLOR_RESET}" ;;
-esac
-
-# Configure boot/firmware/cmdline.txt
-start_spinner "Configuring quiet boot"
+# Required boot parameters
 REQUIREMENTS=(
     "quiet"
     "splash"
     "loglevel=0"
     "logo.nologo"
     "vt.global_cursor_default=0"
-    "fbcon=rotate:$ORIENTATION"
 )
 
-# Check if requirements are already in the file
-parameters=()
+# Check if rotation is set; add prompt only if missing
+if ! grep -q "fbcon=rotate:" "$CMDLINE_FILE"; then
+    while true; do
+        echo -e "${BOLD}How is the screen oriented?${COLOR_RESET}"
+        echo " 0. Landscape - USB ports on the right (default)"
+        echo " 1. Landscape Inverted - USB ports on the left"
+        echo " 2. Portrait - USB ports on the top"
+        echo " 3. Portrait Inverted - USB ports on the bottom"
+        read answer
+        case "$answer" in
+        0 | 1 | 2 | 3)
+            ORIENTATION="$answer"
+            REQUIREMENTS+=("fbcon=rotate:$ORIENTATION")
+            break
+            ;;
+        *)
+            echo -e "${COLOR_RED}Invalid input. Please enter 0, 1, 2, or 3.${COLOR_RESET}"
+            ;;
+        esac
+    done
+fi
+
+# Determine which parameters need to be added
+parameters_to_add=()
 for requirement in "${REQUIREMENTS[@]}"; do
     if ! grep -q "$requirement" "$CMDLINE_FILE"; then
-        parameters+=("$requirement")
+        parameters_to_add+=("$requirement")
     fi
 done
 
+if [[ ${#parameters_to_add[@]} -eq 0 ]]; then
+    echo -e "${COLOR_GREEN}All quiet boot parameters are already set.${COLOR_RESET}"
+    sleep 1
+    exit 0
+fi
+
 # Add parameters to the file
 echo -e "${BOLD}The following parameters will be added to $CMDLINE_FILE:${COLOR_RESET}"
-for param in "${parameters[@]}"; do
-    echo "  - $param"
+for parameter in "${parameters_to_add[@]}"; do
+    echo "  - $parameter"
 done
 echo
 if ! confirm "Proceed with adding parameters?"; then
@@ -68,7 +79,7 @@ if ! confirm "Proceed with adding parameters?"; then
 fi
 
 start_spinner "Adding parameters to $CMDLINE_FILE"
-sudo sed -i 's/$/ ${parameters[@]}/' "$CMDLINE_FILE"
+sudo sed -i "s/$/ ${parameters_to_add[*]}/" "$CMDLINE_FILE"
 stop_spinner
 
 echo -e "${COLOR_GREEN}Quiet boot configured successfully!${COLOR_RESET}"
