@@ -46,7 +46,9 @@ start_spinner() {
 }
 
 stop_spinner() {
-  kill -9 "$SPIN_PID" 2>/dev/null || true
+  if [[ "$SPIN_PID" -gt 0 ]]; then
+    kill -9 "$SPIN_PID" 2>/dev/null || true
+  fi
   printf "\r"
   tput el  # clear line
 }
