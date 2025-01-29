@@ -59,9 +59,12 @@ show_progress() {
   echo -e "${BOLD}${COLOR_BLUE}=== Kiosk Setup Progress ===${COLOR_RESET}"
 
   # Completed steps
-  for step in "${STEPS_COMPLETED[@]}"; do
-    echo -e " ${COLOR_GREEN}✓${COLOR_RESET} $step"
-  done
+  if [[ ${#STEPS_COMPLETED[@]} -gt 0 ]]; then
+    echo
+    for step in "${STEPS_COMPLETED[@]}"; do
+      echo -e " ${COLOR_GREEN}✓${COLOR_RESET} $step"
+    done
+  fi
 
   # Current step
   if [[ -n "$CURRENT_STEP" ]]; then
@@ -109,7 +112,7 @@ run_step() {
   # Modify prompt to indicate mandatory steps
   local prompt="Proceed with '$step_title'"
   if [[ "$mandatory" == "true" ]]; then
-    prompt="${COLOR_RED}Proceed with '$step_title' (MANDATORY)?${COLOR_RESET}"
+    prompt="${BOLD}Proceed with '$step_title' (Required)?${COLOR_RESET}"
   fi
 
   # Confirm with user
