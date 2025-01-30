@@ -21,10 +21,13 @@ main() {
   # Introduction
   clear
   echo -e "${BOLD}${COLOR_BLUE}=== Welcome to the Kiosk Setup Script ===${COLOR_RESET}\n"
-  echo "This script will:"
-  echo " - Update/upgrade packages"
-  echo " - Install kiosk dependencies"
-  echo " - Configure greetd (and other steps you add)"
+  echo -e "This script will:\n"
+  echo " - Update/Upgrade Packages"
+  echo " - Install Kiosk Dependencies"
+  echo " - Configure System Parameters"
+  echo " - Configure Autologin"
+  echo " - Configure Display"
+  echo " - Set Kiosk URL"
   echo
   if ! confirm "Ready to proceed?"; then
     echo -e "${COLOR_RED}Setup canceled by user.${COLOR_RESET}"
@@ -32,12 +35,13 @@ main() {
   fi
 
   # Let's run each step in a chain:
-  # (Add or remove as needed)
   run_step "System Update & Upgrade" "$(dirname "$0")/steps/system_update.sh"
   run_step "Install Dependencies" "$(dirname "$0")/steps/install_dependencies.sh" true
-  run_step "Configure Boot Parameters" "$(dirname "$0")/steps/configure_boot_parameters.sh" true
-  run_step "Configure Greetd" "$(dirname "$0")/steps/configure_greetd.sh" true
+  run_step "Configure System Parameters" "$(dirname "$0")/steps/configure_system_parameters.sh" true
+  run_step "Configure Autologin" "$(dirname "$0")/steps/configure_autologin.sh" true
   run_step "Configure Display" "$(dirname "$0")/steps/configure_display.sh" true
+  run_step "Set Kiosk URL" "$(dirname "$0")/steps/set_kiosk_url.sh" true
+
   run_step "Finalize" "$(dirname "$0")/steps/wrap_up.sh" true true
 }
 

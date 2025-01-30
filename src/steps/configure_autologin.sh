@@ -8,7 +8,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 declare -p STEPS_COMPLETED &>/dev/null || source "$SCRIPT_DIR/../utils.sh"
 
 # Step logic
-CURRENT_STEP="Configure Greetd"
+CURRENT_STEP="Configure Autologin"
 
 show_progress
 
@@ -43,11 +43,13 @@ show_progress
 start_spinner "Configuring and starting greetd"
 echo "$NEW_CONFIG" | sudo tee "$TARGET_FILE" > /dev/null
 sudo systemctl enable greetd > /dev/null 2>&1
-sudo systemctl set-default graphical.target > /dev/null
-sudo systemctl start greetd > /dev/null
+sudo systemctl set-default graphical.target > /dev/null 2>&1
+sudo systemctl start greetd > /dev/null 2>&1
 stop_spinner
 
-echo -e "${COLOR_GREEN}greetd configured successfully!${COLOR_RESET}"
+# TODO: Check if installation was successful
+
+echo -e "${COLOR_GREEN}Autologin configured successfully.${COLOR_RESET}"
 sleep 3
 $IS_SOURCED && return 0 || exit 0
 

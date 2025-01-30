@@ -8,7 +8,28 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 declare -p STEPS_COMPLETED &>/dev/null || source "$SCRIPT_DIR/../utils.sh"
 
 # Step logic
-CURRENT_STEP="Configure Boot Parameters"
+CURRENT_STEP="Configure System Parameters"
+
+show_progress
+
+if confirm "Change the current hostname ($(hostname))?"; then
+    show_progress
+    read -rp "Enter the new hostname: " NEW_HOSTNAME
+    if [[ -n "$NEW_HOSTNAME" ]] && confirm "Set new hostname to '$NEW_HOSTNAME'?"; then
+        start_spinner "Updating hostname"
+        sudo hostnamectl set-hostname "$NEW_HOSTNAME"
+        stop_spinner
+        show_progress
+        echo -e "${COLOR_GREEN}Hostname changed to '$NEW_HOSTNAME' successfully!${COLOR_RESET}"
+    else
+    show_progress
+        echo -e "${COLOR_YELLOW}Hostname change canceled. Keeping '$(hostname)'.${COLOR_RESET}"
+    fi
+else
+    show_progress
+    echo -e "${COLOR_GREEN}Keeping hostname '$(hostname)'.${COLOR_RESET}"
+fi
+sleep 3
 
 show_progress
 
@@ -56,7 +77,7 @@ for requirement in "${REQUIREMENTS[@]}"; do
 done
 
 if [[ ${#parameters_to_add[@]} -eq 0 ]]; then
-    echo -e "${COLOR_GREEN}All quiet boot parameters are already set.${COLOR_RESET}"
+    echo -e "${COLOR_GREEN}All boot parameters are set.${COLOR_RESET}"
     sleep 3
     $IS_SOURCED && return 0 || exit 0
 fi
@@ -80,5 +101,6 @@ sudo sed -i "s/$/ ${parameters_to_add[*]}/" "$CMDLINE_FILE"
 stop_spinner
 
 echo -e "${COLOR_GREEN}Quiet boot configured successfully!${COLOR_RESET}"
+
 sleep 3
 $IS_SOURCED && return 0 || exit 0
