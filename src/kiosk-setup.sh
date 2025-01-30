@@ -37,7 +37,7 @@ main() {
   run_step "Install Dependencies" "$(dirname "$0")/steps/install_dependencies.sh" true
   run_step "Configure Boot Parameters" "$(dirname "$0")/steps/configure_boot_parameters.sh" true
   run_step "Configure Greetd" "$(dirname "$0")/steps/configure_greetd.sh" true
-
+  run_step "Configure Display" "$(dirname "$0")/steps/configure_display.sh" true
   run_step "Finalize" "$(dirname "$0")/steps/wrap_up.sh" true true
 }
 

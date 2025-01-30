@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+
+# Rotate screen
+wlr-randr --output ___SELECTED_DISPLAY___ --transform ___DISPLAY_ROTATION_TRANSFORM___
+
+# Calibrate touch input
+export LIBINPUT_CALIBRATION_MATRIX="___TOUCH_INPUT_CALIBRATION___"
+
+# Launch Chromium in kiosk mode
+chromium-browser \\
+  --app=___HOME_ASSISTANT_URL___ \\
+  --disable-component-update \\
+  --disable-composited-antialiasing \\
+  --disable-features=TranslateUI \\
+  --disable-infobars \\
+  --disable-low-res-tiling \\
+  --disable-restore-session-state \\
+  --disable-session-crashed-bubble \\
+  --disable-smooth-scrolling \\
+  --enable-accelerated-video-decode \\
+  --enable-features=OverlayScrollbar \\
+  --enable-gpu-rasterization \\
+  --enable-low-end-device-mode \\
+  --enable-oop-rasterization \\
+  --fast \\
+  --fast-start \\
+  --force-dark-mode \\
+  --ignore-gpu-blocklist \\
+  --kiosk \\
+  --no-first-run \\
+  --noerrdialogs \\
+  --overscroll-history-navigation=0 \\
+  --ozone-platform=wayland \\
+  --simulate-outdated-no-au='Tue, 31 Dec 2099 23:59:59 GMT' \\
+  --start-maximized

@@ -12,7 +12,7 @@ CURRENT_STEP="Configure Greetd"
 
 show_progress
 
-TEMPLATE_FILE="$SCRIPT_DIR/../templates/greetd_config.toml.template"
+TEMPLATE_FILE="$SCRIPT_DIR/../templates/greetd_configuration.toml.template"
 TARGET_FILE="/etc/greetd/config.toml"
 
 if [[ ! -f "$TEMPLATE_FILE" ]]; then

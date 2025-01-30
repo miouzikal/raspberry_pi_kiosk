@@ -27,9 +27,9 @@ REQUIREMENTS=(
 if ! grep -q "fbcon=rotate:" "$CMDLINE_FILE"; then
     while true; do
         echo -e "${BOLD}How is the screen oriented?${COLOR_RESET}"
-        echo " 0. Normal (0 degree)
-        echo " 1. Clockwise (90 degrees)
-        echo " 2. Upside-down (180 degrees)
+        echo " 0. Normal (0 degree)"
+        echo " 1. Clockwise (90 degrees)"
+        echo " 2. Upside-down (180 degrees)"
         echo " 3. Counterclockwise (270 degrees)"
         echo -n -e "\nScreen orientation: "
         read answer

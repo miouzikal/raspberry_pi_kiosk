@@ -13,6 +13,8 @@ CURRENT_STEP="Configure Display & Touch"
 show_progress
 
 CMDLINE_FILE="/boot/firmware/cmdline.txt"
+TEMPLATE_FILE="$SCRIPT_DIR/../templates/labwc_configuration.toml.template"
+TARGET_FILE="/home/$(whoami)/.config/labwc/autostart"
 
 # Get rotation from kernel parameters
 CURRENT_ROTATION=$(grep -o 'fbcon=rotate:[0-9]' "$CMDLINE_FILE" | cut -d':' -f2)
@@ -111,7 +113,6 @@ Configuration Summary:
 
   - Display: ${DISPLAYS[$SELECTED_DISPLAY]}
   - Rotation: $DISPLAY_ROTATION_TRANSFORM
-  - Touch Device: ${selected_touch:-None detected}
   - Touch Calibration Matrix: $TOUCH_INPUT_CALIBRATION
 EOF
 )
@@ -120,3 +121,39 @@ if ! confirm "${CONFIG_SUMMARY}\n\nApply these settings?"; then
     echo -e "${COLOR_YELLOW}Skipping display & touch configuration.${COLOR_RESET}"
     $IS_SOURCED && return 0 || exit 0
 fi
+
+show_progress
+
+# Show the content of the template
+NEW_CONFIG=$(sed -e "s|___SELECTED_DISPLAY___|${SELECTED_DISPLAY}|g" \
+                 -e "s|___DISPLAY_ROTATION_TRANSFORM___|${DISPLAY_ROTATION_TRANSFORM}|g" \
+                 -e "s|___TOUCH_INPUT_CALIBRATION___|${TOUCH_INPUT_CALIBRATION}|g" \
+                    "$TEMPLATE_FILE")
+
+CONFIRM_MESSAGE=$(cat <<EOF
+${BOLD}The following configuration will be written to '$TARGET_FILE':${COLOR_RESET}
+------------------------------------------------------------
+$NEW_CONFIG
+------------------------------------------------------------
+
+Do you want to apply these settings?
+EOF
+)
+
+if ! confirm "$CONFIRM_MESSAGE"; then
+    echo -e "${COLOR_RED}User canceled display & touch configuration.${COLOR_RESET}"
+    $IS_SOURCED && return 1 || exit 1
+fi
+
+show_progress
+
+# Write the new configuration
+start_spinner "Configuring kiosk display & touch"
+mkdir -p "$(dirname "$TARGET_FILE")"
+echo "$NEW_CONFIG" | sudo tee "$TARGET_FILE" > /dev/null
+sudo chmod +x "$TARGET_FILE"
+stop_spinner
+
+echo -e "${COLOR_GREEN}Display & touch configured successfully!${COLOR_RESET}"
+sleep 3
+$IS_SOURCED && return 0 || exit 0
