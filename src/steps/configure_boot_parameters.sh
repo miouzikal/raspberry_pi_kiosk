@@ -8,7 +8,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 declare -p STEPS_COMPLETED &>/dev/null || source "$SCRIPT_DIR/../utils.sh"
 
 # Step logic
-CURRENT_STEP="Configure Quiet Boot"
+CURRENT_STEP="Configure Boot Parameters"
 
 show_progress
 
@@ -27,10 +27,10 @@ REQUIREMENTS=(
 if ! grep -q "fbcon=rotate:" "$CMDLINE_FILE"; then
     while true; do
         echo -e "${BOLD}How is the screen oriented?${COLOR_RESET}"
-        echo " 0. Landscape - USB ports on the right (default)"
-        echo " 1. Landscape Inverted - USB ports on the left"
-        echo " 2. Portrait - USB ports on the top"
-        echo " 3. Portrait Inverted - USB ports on the bottom"
+        echo " 0. Normal (0 degree)
+        echo " 1. Clockwise (90 degrees)
+        echo " 2. Upside-down (180 degrees)
+        echo " 3. Counterclockwise (270 degrees)"
         echo -n -e "\nScreen orientation: "
         read answer
         case "$answer" in

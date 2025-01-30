@@ -35,7 +35,7 @@ main() {
   # (Add or remove as needed)
   run_step "System Update & Upgrade" "$(dirname "$0")/steps/system_update.sh"
   run_step "Install Dependencies" "$(dirname "$0")/steps/install_dependencies.sh" true
-  run_step "Configure Quiet Boot" "$(dirname "$0")/steps/configure_quiet_boot.sh" true
+  run_step "Configure Boot Parameters" "$(dirname "$0")/steps/configure_boot_parameters.sh" true
   run_step "Configure Greetd" "$(dirname "$0")/steps/configure_greetd.sh" true
 
   run_step "Finalize" "$(dirname "$0")/steps/wrap_up.sh" true true
