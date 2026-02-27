@@ -21,28 +21,27 @@ main() {
   # Introduction
   clear
   echo -e "${BOLD}${COLOR_BLUE}=== Welcome to the Kiosk Setup Script ===${COLOR_RESET}\n"
-  echo -e "This script will:\n"
-  echo " - Update/Upgrade Packages"
-  echo " - Install Kiosk Dependencies"
-  echo " - Configure System Parameters"
-  echo " - Configure Autologin"
-  echo " - Configure Display"
-  echo " - Set Kiosk URL"
+  echo "This script will:"
+  echo " - Update/upgrade packages"
+  echo " - Install kiosk dependencies (Cage, Cog, Plymouth)"
+  echo " - Configure quiet boot and RPi firmware"
+  echo " - Configure screen orientation and display"
+  echo " - Configure Plymouth boot splash"
+  echo " - Configure the kiosk service (Cage + Cog)"
   echo
   if ! confirm "Ready to proceed?"; then
     echo -e "${COLOR_RED}Setup canceled by user.${COLOR_RESET}"
     exit 1
   fi
 
-  # Let's run each step in a chain:
-  run_step "System Update & Upgrade" "$(dirname "$0")/steps/system_update.sh"
-  run_step "Install Dependencies" "$(dirname "$0")/steps/install_dependencies.sh" true
-  run_step "Configure System Parameters" "$(dirname "$0")/steps/configure_system_parameters.sh" true
-  run_step "Configure Autologin" "$(dirname "$0")/steps/configure_autologin.sh" true
-  run_step "Configure Display" "$(dirname "$0")/steps/configure_display.sh" true
-  run_step "Set Kiosk URL" "$(dirname "$0")/steps/set_kiosk_url.sh" true
+  run_step "System Update & Upgrade"     "$(dirname "$0")/steps/system_update.sh"
+  run_step "Install Dependencies"        "$(dirname "$0")/steps/install_dependencies.sh"    true
+  run_step "Configure Quiet Boot"        "$(dirname "$0")/steps/configure_quiet_boot.sh"    true
+  run_step "Configure Screen"            "$(dirname "$0")/steps/configure_screen.sh"         true
+  run_step "Configure Plymouth"          "$(dirname "$0")/steps/configure_plymouth.sh"       true
+  run_step "Configure Kiosk Service"     "$(dirname "$0")/steps/configure_kiosk_service.sh"  true
 
-  run_step "Finalize" "$(dirname "$0")/steps/wrap_up.sh" true true
+  bash "$(dirname "$0")/steps/wrap_up.sh"
 }
 
 main

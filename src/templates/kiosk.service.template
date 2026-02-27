@@ -1,0 +1,30 @@
+[Unit]
+Description=Kiosk Web Browser (Cage + Cog)
+After=systemd-user-sessions.service plymouth-quit-wait.service dbus.socket systemd-logind.service
+Wants=dbus.socket systemd-logind.service
+Conflicts=getty@tty7.service
+
+[Service]
+Type=simple
+User=___CURRENT_USER___
+PAMName=cage
+TTYPath=/dev/tty7
+TTYReset=yes
+TTYVHangup=yes
+TTYVTDisallocate=yes
+
+Environment=WLR_LIBINPUT_NO_DEVICES=1
+ExecStartPre=-+/usr/bin/plymouth quit --retain-splash
+ExecStart=/usr/bin/cage -d ___CAGE_ROTATION___ -- /usr/bin/cog --platform=wl ___HA_URL___
+ExecStartPost=+/usr/bin/chvt 7
+
+Restart=always
+RestartSec=5
+StartLimitBurst=5
+StartLimitIntervalSec=60
+
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=graphical.target

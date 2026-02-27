@@ -21,7 +21,7 @@ SPINNER=('⣾' '⣽' '⣻' '⢿' '⡿' '⣟' '⣯' '⣷')
 # -----------------------------------------------------------------------------
 # Shared Variables
 # -----------------------------------------------------------------------------
-declare -a STEPS_COMPLETED # Stores list of completed steps
+declare -a STEPS_COMPLETED  # Stores list of completed steps
 CURRENT_STEP=""
 SPIN_PID=0
 SPIN_MSG=""
@@ -32,7 +32,7 @@ SPIN_MSG=""
 spinner() {
   local i=0
   while :; do
-    i=$(((i + 1) % 8))
+    i=$(( (i+1) % 8 ))
     printf "\r${COLOR_YELLOW}%s${COLOR_RESET} %s" "${SPINNER[$i]}" "$SPIN_MSG"
     sleep 0.1
   done
@@ -47,10 +47,11 @@ start_spinner() {
 
 stop_spinner() {
   if [[ "$SPIN_PID" -gt 0 ]]; then
-    kill -9 "$SPIN_PID" 2>/dev/null || true
+    kill "$SPIN_PID" 2>/dev/null || true
+    SPIN_PID=0
   fi
   printf "\r"
-  tput el # clear line
+  tput el 2>/dev/null || true
 }
 
 # -----------------------------------------------------------------------------
@@ -58,10 +59,11 @@ stop_spinner() {
 # -----------------------------------------------------------------------------
 show_progress() {
   clear
-  echo -e "${BOLD}${COLOR_BLUE}=== Kiosk Setup Progress ===${COLOR_RESET}\n"
+  echo -e "${BOLD}${COLOR_BLUE}=== Kiosk Setup Progress ===${COLOR_RESET}"
 
   # Completed steps
   if [[ ${#STEPS_COMPLETED[@]} -gt 0 ]]; then
+    echo
     for step in "${STEPS_COMPLETED[@]}"; do
       echo -e " ${COLOR_GREEN}✓${COLOR_RESET} $step"
     done
@@ -69,6 +71,7 @@ show_progress() {
 
   # Current step
   if [[ -n "$CURRENT_STEP" ]]; then
+    echo
     echo -e "${COLOR_YELLOW}=> $CURRENT_STEP${COLOR_RESET}"
     echo
   fi
@@ -78,16 +81,16 @@ show_progress() {
 # Confirmation Prompt
 # -----------------------------------------------------------------------------
 confirm() {
-  local prompt="$1"
-  while true; do
-    echo -n -e "${BOLD}${prompt}${COLOR_RESET} [Y/n] "
-    read answer
-    case "$answer" in
-    [Yy]* | "") return 0 ;;
-    [Nn]*) return 1 ;;
-    *) echo -e "${COLOR_RED}Invalid input. Please enter Y or N.${COLOR_RESET}" ;;
-    esac
-  done
+    local prompt="$1"
+    while true; do
+        echo -n -e "${BOLD}${prompt}${COLOR_RESET} [Y/n] "
+        read -r answer
+        case "$answer" in
+            [Yy]* | "") return 0 ;;
+            [Nn]*) return 1 ;;
+            *) echo -e "${COLOR_RED}Invalid input. Please enter Y or N.${COLOR_RESET}" ;;
+        esac
+    done
 }
 
 # -----------------------------------------------------------------------------
@@ -96,13 +99,12 @@ confirm() {
 run_step() {
   local step_title="$1"
   local step_script="$2"
-  local mandatory="${3:-false}"
-  local skip_confirm="${4:-false}"
+  local mandatory="${3:-false}"  # Default to false if not provided
 
   CURRENT_STEP="$step_title"
   show_progress
 
-  # Handle missing scripts immediately
+  # If the step script doesn't exist, skip
   if [[ ! -f "$step_script" ]]; then
     echo -e "${COLOR_RED}Script $step_script not found. Skipping.${COLOR_RESET}"
     STEPS_COMPLETED+=("${step_title} (Skipped - Not Found)")
@@ -110,42 +112,35 @@ run_step() {
     return
   fi
 
-  # Build confirmation prompt
-  local prompt="Proceed with '$step_title'?"
-  [[ "$mandatory" == "true" ]] && prompt="${BOLD}Proceed with '$step_title' (Required)?${COLOR_RESET}"
-
-  # Determine if we should proceed
-  local proceed=false
-  if [[ "$skip_confirm" == "true" ]]; then
-    proceed=true
-  else
-    confirm "$prompt" && proceed=true
+  # Modify prompt to indicate mandatory steps
+  local prompt="Proceed with '$step_title'"
+  if [[ "$mandatory" == "true" ]]; then
+    prompt="${BOLD}Proceed with '$step_title' (Required)?${COLOR_RESET}"
   fi
 
-  # Handle user skip
-  if ! $proceed; then
+  # Confirm with user
+  if ! confirm "$prompt"; then
     echo -e "${COLOR_YELLOW}Skipped '${step_title}'.${COLOR_RESET}"
     STEPS_COMPLETED+=("${step_title} (Skipped)")
+
     if [[ "$mandatory" == "true" ]]; then
       echo -e "${COLOR_RED}This step is mandatory. Aborting setup.${COLOR_RESET}"
       exit 1
     fi
+    sleep 1
     return
   fi
 
-  # Execute the step
-  if source "$step_script"; then
-    STEPS_COMPLETED+=("$step_title")
-  else
-    echo -e "${COLOR_RED}Step '$step_title' failed.${COLOR_RESET}"
-    if [[ "$mandatory" == "true" ]]; then
-      echo -e "${COLOR_RED}This step is mandatory. Aborting setup.${COLOR_RESET}"
-      exit 1
-    fi
+  # Run the step
+  if ! bash "$step_script"; then
+    echo -e "${COLOR_RED}Step '$step_title' did not complete successfully.${COLOR_RESET}"
+    echo -e "- Aborting setup.${COLOR_RESET}"
+    exit 1
   fi
+  STEPS_COMPLETED+=("$step_title")
 }
 
 # -----------------------------------------------------------------------------
 # Ensure spinner is stopped on exit
 # -----------------------------------------------------------------------------
-trap 'stop_spinner' EXIT
+trap 'stop_spinner' EXIT INT TERM
