@@ -1,0 +1,12 @@
+[Unit]
+Description=GPIO Button Handler
+After=multi-user.target
+
+[Service]
+ExecStart=/usr/bin/python3 /home/___CURRENT_USER___/button_handler.py
+User=___CURRENT_USER___
+Restart=always
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target

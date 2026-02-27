@@ -24,14 +24,14 @@ show_progress
 prerequisites=(
     alsa-utils
     cage
-    cog
+    chromium-browser
+    fonts-noto-color-emoji
     git
     i2c-tools
+    imagemagick
     libinput-tools
-    plymouth
-    plymouth-themes
-    seatd
     vim
+    wlr-randr
 )
 
 # create list of packages to install

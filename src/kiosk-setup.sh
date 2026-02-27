@@ -23,11 +23,14 @@ main() {
   echo -e "${BOLD}${COLOR_BLUE}=== Welcome to the Kiosk Setup Script ===${COLOR_RESET}\n"
   echo "This script will:"
   echo " - Update/upgrade packages"
-  echo " - Install kiosk dependencies (Cage, Cog, Plymouth)"
+  echo " - Install kiosk dependencies (Cage, Chromium)"
+  echo " - Configure hostname"
   echo " - Configure quiet boot and RPi firmware"
   echo " - Configure screen orientation and display"
-  echo " - Configure Plymouth boot splash"
-  echo " - Configure the kiosk service (Cage + Cog)"
+  echo " - Configure framebuffer splash screen"
+  echo " - Configure the kiosk service (Cage + Chromium)"
+  echo " - Configure performance (overclocking, WiFi driver)"
+  echo " - Configure extras (GPIO button handler, wake-on-sound)"
   echo
   if ! confirm "Ready to proceed?"; then
     echo -e "${COLOR_RED}Setup canceled by user.${COLOR_RESET}"
@@ -36,10 +39,13 @@ main() {
 
   run_step "System Update & Upgrade"     "$(dirname "$0")/steps/system_update.sh"
   run_step "Install Dependencies"        "$(dirname "$0")/steps/install_dependencies.sh"    true
+  run_step "Configure Hostname"          "$(dirname "$0")/steps/configure_hostname.sh"      true
   run_step "Configure Quiet Boot"        "$(dirname "$0")/steps/configure_quiet_boot.sh"    true
   run_step "Configure Screen"            "$(dirname "$0")/steps/configure_screen.sh"         true
-  run_step "Configure Plymouth"          "$(dirname "$0")/steps/configure_plymouth.sh"       true
+  run_step "Configure Splash Screen"     "$(dirname "$0")/steps/configure_splash.sh"         true
   run_step "Configure Kiosk Service"     "$(dirname "$0")/steps/configure_kiosk_service.sh"  true
+  run_step "Configure Performance"        "$(dirname "$0")/steps/configure_performance.sh"    true
+  run_step "Configure Extras"            "$(dirname "$0")/steps/configure_extras.sh"         true
 
   bash "$(dirname "$0")/steps/wrap_up.sh"
 }

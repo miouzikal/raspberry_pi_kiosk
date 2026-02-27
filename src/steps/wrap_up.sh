@@ -19,9 +19,17 @@ show_progress
 echo -e "${COLOR_GREEN}Kiosk setup complete!${COLOR_RESET}"
 echo
 echo "The following has been configured:"
-echo "  - Quiet boot with Plymouth splash screen"
-echo "  - Screen orientation and display settings"
-echo "  - Cage + Cog kiosk service (WPE WebKit)"
+echo "  - Hostname"
+echo "  - Quiet boot with framebuffer splash screen"
+echo "  - Screen orientation, display detection, and touch calibration"
+echo "  - Transparent cursor theme"
+echo "  - Cage + Chromium kiosk service"
+echo "  - CPU performance governor"
+echo "  - Disabled unnecessary services"
+echo "  - CPU/GPU overclocking (optional)"
+echo "  - WiFi adapter driver (optional)"
+echo "  - GPIO button handler (optional)"
+echo "  - Wake-on-sound (optional)"
 echo
 echo -e "${BOLD}A reboot is required to apply all changes.${COLOR_RESET}"
 echo

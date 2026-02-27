@@ -1,0 +1,14 @@
+[Unit]
+Description=Wake display on sound detection
+After=kiosk.service
+Wants=kiosk.service
+
+[Service]
+Environment=KIOSK_DISPLAY_OUTPUT=___DISPLAY_OUTPUT___
+ExecStart=/home/___CURRENT_USER___/wake_on_sound.sh
+User=___CURRENT_USER___
+Restart=always
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target

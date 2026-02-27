@@ -1,27 +1,57 @@
 [Unit]
-Description=Kiosk Web Browser (Cage + Cog)
-After=systemd-user-sessions.service plymouth-quit-wait.service dbus.socket systemd-logind.service
+Description=Kiosk Web Browser (Cage + Chromium)
+After=systemd-user-sessions.service dbus.socket systemd-logind.service
 Wants=dbus.socket systemd-logind.service
-Conflicts=getty@tty7.service
+Conflicts=getty@tty1.service
+StartLimitBurst=5
+StartLimitIntervalSec=60
 
 [Service]
 Type=simple
 User=___CURRENT_USER___
 PAMName=cage
-TTYPath=/dev/tty7
+TTYPath=/dev/tty1
 TTYReset=yes
 TTYVHangup=yes
 TTYVTDisallocate=yes
 
 Environment=WLR_LIBINPUT_NO_DEVICES=1
-ExecStartPre=-+/usr/bin/plymouth quit --retain-splash
-ExecStart=/usr/bin/cage -d ___CAGE_ROTATION___ -- /usr/bin/cog --platform=wl ___HA_URL___
-ExecStartPost=+/usr/bin/chvt 7
+Environment=XCURSOR_THEME=transparent
+Environment=XCURSOR_SIZE=1
+ExecStartPre=+/sbin/modprobe vc4
+ExecStartPre=+/sbin/modprobe v3d
+ExecStart=/usr/bin/cage -d -- /usr/bin/chromium-browser \
+    --ozone-platform=wayland \
+    --kiosk \
+    --start-maximized \
+    --noerrdialogs \
+    --disable-infobars \
+    --no-first-run \
+    --disable-session-crashed-bubble \
+    --disable-restore-session-state \
+    --enable-features=UseOzonePlatform,OverlayScrollbar \
+    --disable-features=TranslateUI \
+    --disable-pinch \
+    --disable-smooth-scrolling \
+    --disable-composited-antialiasing \
+    --disable-low-res-tiling \
+    --overscroll-history-navigation=disabled \
+    --check-for-update-interval=31536000 \
+    --simulate-outdated-no-au='Tue, 31 Dec 2099 23:59:59 GMT' \
+    --disable-component-update \
+    --enable-gpu-rasterization \
+    --enable-zero-copy \
+    --enable-oop-rasterization \
+    --enable-accelerated-video-decode \
+    --enable-low-end-device-mode \
+    --ignore-gpu-blocklist \
+    --force-dark-mode \
+    --fast \
+    --fast-start \
+    ___HA_URL___
 
 Restart=always
 RestartSec=5
-StartLimitBurst=5
-StartLimitIntervalSec=60
 
 StandardOutput=journal
 StandardError=journal
