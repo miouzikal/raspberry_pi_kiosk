@@ -1,0 +1,25 @@
+config_version = 1
+
+[system]
+hostname = "___HOSTNAME___"
+
+[user]
+name = "___USERNAME___"
+password = "___PASSWORD_HASH___"
+password_encrypted = true
+
+[ssh]
+enabled = true
+password_authentication = false
+authorized_keys = [ "___SSH_PUBLIC_KEY___" ]
+
+[wlan]
+ssid = "___WIFI_SSID___"
+password = "___WIFI_PASSWORD___"
+password_encrypted = false
+hidden = false
+country = "___WIFI_COUNTRY___"
+
+[locale]
+keymap = "___KEYMAP___"
+timezone = "___TIMEZONE___"
